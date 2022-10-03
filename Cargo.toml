@@ -10,3 +10,5 @@ authors = ["Anas Elgarhy <anas.elgarhy.dev@gmail.com>"]
 clap = { version = "4.0.8-rc.3", features = ["derive"] }
 colored = "2.0.0"
 image = "0.24.4"
+log = "0.4.17"
+pretty_env_logger = "0.4.0"
