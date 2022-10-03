@@ -1,10 +1,8 @@
-
-
 use image::{GenericImageView, DynamicImage};
 use colored::{ColoredString, Colorize};
 use crate::args::{
     args::Arguments,
-    enums::Mode
+    enums::Mode,
 };
 
 pub fn generate_ascii(image: DynamicImage, args: &Arguments) -> Vec<ColoredString> {
@@ -19,7 +17,7 @@ pub fn generate_ascii(image: DynamicImage, args: &Arguments) -> Vec<ColoredStrin
                 output.push(get_character(
                     image.get_pixel(x, y),
                     &characters, args.mode,
-                    &args.background
+                    &args.background,
                 ));
             }
         }
@@ -34,8 +32,8 @@ pub fn generate_ascii(image: DynamicImage, args: &Arguments) -> Vec<ColoredStrin
 
 fn get_character(
     pixel: image::Rgba<u8>,
-                 characters: &Vec<char>, mode: Mode,
-                 background: &Option<String>
+    characters: &Vec<char>, mode: Mode,
+    background: &Option<String>,
 ) -> ColoredString {
     let intent = if pixel[3] == 0 { 0 } else { pixel[0] / 3 + pixel[1] / 3 + pixel[2] / 3 };
 
