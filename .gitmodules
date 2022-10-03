@@ -1,0 +1,3 @@
+[submodule "archpackage/aarty"]
+	path = archpackage/aarty
+	url = ssh://aur@aur.archlinux.org/aarty.git
