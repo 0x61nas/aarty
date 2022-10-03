@@ -59,8 +59,12 @@ fn main() {
     info!("Outputting image");
     match arguments.output_method {
         OutputMethod::File => {
-            match std::fs::write(arguments.output.clone(),
-                                 output.iter().map(|s| s.to_string()).collect::<String>()) {
+            match std::fs::write(
+                arguments.output.clone(),
+                output.iter()
+                    .map(|s| format!("{}", s))
+                    .collect::<String>(),
+            ) {
                 Ok(_) => info!("Successfully outputted image: {}", arguments.output),
                 Err(e) => {
                     error!("Failed to output image: {:?}", e);
