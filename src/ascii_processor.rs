@@ -1,5 +1,5 @@
-use clap::arg;
-use clap::builder::Str;
+
+
 use image::{GenericImageView, DynamicImage};
 use colored::{ColoredString, Colorize};
 use crate::args::{
