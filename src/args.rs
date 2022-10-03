@@ -19,6 +19,9 @@ pub mod args {
         /// The output scale (1 is the original size)
         #[arg(short, long, default_value="4")]
         pub scale: u32,
+        /// The background color to use
+        #[arg(short, long, default_value=None)]
+        pub background: Option<String>,
         /// The output file to write to (if output_method is file)
         #[arg(short, long, default_value="ascii_image.txt")]
         pub output: String,

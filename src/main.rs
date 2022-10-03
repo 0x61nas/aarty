@@ -1,7 +1,7 @@
 use std::io::Write;
 use clap::Parser;
 use image::GenericImageView;
-use colored::Colorize;
+
 
 extern crate pretty_env_logger;
 #[macro_use]
@@ -12,7 +12,7 @@ mod ascii_processor;
 
 use crate::args::{
     args::Arguments,
-    enums::{Mode, OutputMethod},
+    enums::OutputMethod,
 };
 
 use crate::ascii_processor::generate_ascii;
@@ -52,17 +52,8 @@ fn main() {
     trace!("Image dimensions: {:?}", image.dimensions());
 
     // Process the image
-    let output = match generate_ascii(image, &arguments) {
-        Ok(out) => {
-            info!("Successfully processed image");
-            out
-        }
-        Err(e) => {
-            error!("Failed to process image: {:?}", e);
-            eprintln!("Failed to process image: {:?}", e);
-            std::process::exit(1);
-        }
-    };
+    let output = generate_ascii(image, &arguments);
+    info!("Successfully processed image");
 
     // Output the image
     info!("Outputting image");

@@ -1,4 +1,5 @@
 use clap::arg;
+use clap::builder::Str;
 use image::{GenericImageView, DynamicImage};
 use colored::{ColoredString, Colorize};
 use crate::args::{
@@ -6,7 +7,7 @@ use crate::args::{
     enums::Mode
 };
 
-pub fn generate_ascii(image: DynamicImage, args: &Arguments) -> Result<Vec<ColoredString>, error::ASCIIProcessingError> {
+pub fn generate_ascii(image: DynamicImage, args: &Arguments) -> Vec<ColoredString> {
     let characters = args.characters.chars().collect::<Vec<char>>();
     trace!("Characters: {:?}, length: {}", characters, characters.len());
     let mut output = Vec::new();
@@ -15,7 +16,11 @@ pub fn generate_ascii(image: DynamicImage, args: &Arguments) -> Result<Vec<Color
     for y in 0..height {
         for x in 0..width {
             if y % (args.scale * 2) == 0 && x % args.scale == 0 {
-                output.push(get_character(image.get_pixel(x, y), &characters, args.mode));
+                output.push(get_character(
+                    image.get_pixel(x, y),
+                    &characters, args.mode,
+                    &args.background
+                ));
             }
         }
         // Add a new line at the end of each row
@@ -24,51 +29,30 @@ pub fn generate_ascii(image: DynamicImage, args: &Arguments) -> Result<Vec<Color
         }
     }
 
-    Ok(output)
+    output
 }
 
-fn get_character(pixel: image::Rgba<u8>, characters: &Vec<char>, mode: Mode) -> ColoredString {
+fn get_character(
+    pixel: image::Rgba<u8>,
+                 characters: &Vec<char>, mode: Mode,
+                 background: &Option<String>
+) -> ColoredString {
     let intent = if pixel[3] == 0 { 0 } else { pixel[0] / 3 + pixel[1] / 3 + pixel[2] / 3 };
 
     let ch = characters[(intent / (32 + 7 - (7 + (characters.len() - 7)) as u8)) as usize];
 
     let ch = String::from(ch);
 
-    match mode {
+    let ch = match mode {
         Mode::NormalAscii => ColoredString::from(&*ch),
         Mode::COLORED => {
             ch.to_string()
                 .truecolor(pixel[0], pixel[1], pixel[2])
         }
-    }
-}
+    };
 
-mod error {
-    use std::error::Error;
-    use std::fmt::{Debug, Display, Formatter};
-
-    #[derive(Debug)]
-    pub struct ASCIIProcessingError {
-        message: String,
-    }
-
-    impl ASCIIProcessingError {
-        pub fn new(message: String) -> Self {
-            ASCIIProcessingError {
-                message
-            }
-        }
-    }
-
-    impl Display for ASCIIProcessingError {
-        fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{}", self.message)
-        }
-    }
-
-    impl Error for ASCIIProcessingError {
-        fn description(&self) -> &str {
-            &self.message
-        }
+    match background {
+        Some(bg) => ch.on_color(bg.to_string()),
+        None => ch
     }
 }
