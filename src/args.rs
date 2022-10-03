@@ -11,9 +11,13 @@ pub mod args {
         pub output_method: OutputMethod,
         /// The image to convert to ASCII art
         pub image: String,
+        /// The character to use for drawing the image (lighter to darker)
+        /// You can user one character if you uses the color mode
+        #[arg(short, long, default_value=" .,-~:;=!*#$@")]
+        pub characters: String,
         /// The output file to write to (if output_method is file)
-        #[arg(short, long, default_value=Some("ascii_image.txt"))]
-        pub output: Option<String>,
+        #[arg(short, long, default_value="ascii_image.txt")]
+        pub output: String,
     }
 
     #[derive(Copy, Clone, ValueEnum, Debug, PartialOrd, Eq, PartialEq)]
