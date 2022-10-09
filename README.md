@@ -56,7 +56,7 @@
 
 - from crates.io
     ```bash
-    crago install aarty
+    cargo install aarty
     ```
 - From aur: 
   ```shell 
