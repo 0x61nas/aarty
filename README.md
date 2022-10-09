@@ -1,4 +1,4 @@
-# aarty: A simple CLI tool to convert the images to ASCII art with rust 🦀
+# aarty: A simple CLI tool to convert images to ASCII art with Rust 🦀
 
 ![srceenshots/anime_2_colored_scale_4.gif](./srceenshots/anime_2_colored_scale_4.gif)
 ![money mouth face colored scale 2](./srceenshots/money_mouth_face_colored_scale_2.png)
