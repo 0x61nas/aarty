@@ -1,6 +1,6 @@
 pub mod args {
-    use clap::{Parser, arg, ColorChoice};
     use super::enums::*;
+    use clap::{arg, ColorChoice, Parser};
 
     #[derive(Parser, Debug)]
     #[command(author, version, about, long_about = None, color = ColorChoice::Always)]
@@ -29,7 +29,7 @@ pub mod args {
 
     impl Arguments {
         pub fn validate(&self) -> Result<(), String> {
-            if self.characters.len() == 0 {
+            if self.characters.is_empty() {
                 return Err("No characters provided".to_string());
             } else if self.characters.len() == 1 {
                 if self.mode == Mode::NormalAscii {
@@ -53,7 +53,7 @@ pub mod enums {
         NormalAscii,
         /// Colored ASCII art, the colors are based on the terminal colors
         #[clap(alias = "c")]
-        COLORED,
+        Colored,
     }
 
     #[derive(Copy, Clone, ValueEnum, Debug, PartialOrd, Eq, PartialEq)]
