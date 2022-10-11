@@ -1,6 +1,6 @@
 [package]
 name = "aarty"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Anas Elgarhy <anas.elgarhy.dev@gmail.com>"]
 description = "A simple CLI tool to convert the images to ASCII art"
@@ -31,7 +31,7 @@ exclude = ["images/*"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4.0.8-rc.3", features = ["derive"] }
+clap = { version = "4.0.12-rc.3", features = ["derive"] }
 colored = "2.0.0"
 image = "0.24.4"
 log = "0.4.17"
