@@ -105,6 +105,12 @@ Options:
           
           [default: 4]
 
+  -w, --width <WIDTH>
+          In case you know how many columns are needed, this paramter will calcualte the scale factor for you.
+          Overrides `scale` parameter even when specified.
+
+          [default: disabled]
+
   -b, --background <BACKGROUND>
           The background color to use
 
