@@ -105,6 +105,9 @@ Options:
           
           [default: 4]
 
+  -w, --width <WIDTH>
+          Enstablish how much wide is the output images, in columns. Overrides `scale`
+
   -b, --background <BACKGROUND>
           The background color to use
 
