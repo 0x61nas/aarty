@@ -66,6 +66,7 @@ fn get_character(
 /// Determine how much scale to use in presence of `width` parameters,
 /// otherwise returns regular `scale` parameter per default behaviour
 ///
+#[inline]
 fn calculate_scale(args: &Arguments, dimensions: (u32, u32)) -> u32 {
     args.width.map_or_else(|| args.scale, |v| dimensions.0 / v)
 }

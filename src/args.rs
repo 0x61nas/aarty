@@ -19,7 +19,7 @@ pub mod args {
         /// The output scale (1 is the original size)
         #[arg(short, long, default_value = "4")]
         pub scale: u32,
-        // Enstablish how much wide is the output images, in columns. Overrides `scale`
+        /// Enstablish how much wide is the output images, in columns. Overrides `scale`
         #[arg(short, long, default_value= None )]
         pub width: Option<u32>,
         /// The background color to use

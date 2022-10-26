@@ -106,10 +106,7 @@ Options:
           [default: 4]
 
   -w, --width <WIDTH>
-          Width expressed as text-columns, this parameter will calculate the scale factor for you.
-          Overrides `scale` parameter even when specified.
-
-          [default: disabled]
+          Enstablish how much wide is the output images, in columns. Overrides `scale`
 
   -b, --background <BACKGROUND>
           The background color to use
