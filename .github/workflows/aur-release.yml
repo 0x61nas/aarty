@@ -14,11 +14,10 @@ jobs:
         - name: Publish AUR package
           uses: anas-elgarhy/aur-release-action@v1.1
           with:
-            package_name: aur-package-name # Use this if the package name in AUR is different from the repository name
             ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
             github_token: ${{ secrets.GITHUB_TOKEN }}
-            pkgbuild_path: archpackge/PKGBUILD # Use this if the PKGBUILD file is not in the root directory
-            aur_submodule_path: archpackge/aarty
+            pkgbuild_path: archpackage/PKGBUILD # Use this if the PKGBUILD file is not in the root directory
+            aur_submodule_path: archpackage/aarty
             git_username: Anas Elgarhy # Use this if you want to change the git username (recommended)
             git_email: anas.elgarhy.dev@gmail.com # Use this if you want to change the git email (recommended)
             commit_message: UpUp Update %FILENAME% to %VERSION% yoo # Use this if you want to change the commit message
