@@ -12,7 +12,7 @@ jobs:
         - uses: actions/checkout@v2
     
         - name: Publish AUR package
-          uses: anas-elgarhy/aur-release-action@v3.3
+          uses: anas-elgarhy/aur-release-action@v3.4
           with:
             ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
             github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -21,3 +21,4 @@ jobs:
             git_username: Anas Elgarhy # Use this if you want to change the git username (recommended)
             git_email: anas.elgarhy.dev@gmail.com # Use this if you want to change the git email (recommended)
             commit_message: UpUp Update %FILENAME% to %VERSION% yoo # Use this if you want to change the commit message
+            try_build_and_install: false
