@@ -9,7 +9,7 @@ jobs:
     aur-publish:
         runs-on: ubuntu-latest
         steps:
-        - uses: actions/checkout@v2
+        - uses: actions/checkout@v3
     
         - name: Publish AUR package
           uses: anas-elgarhy/aur-release-action@v4.1
