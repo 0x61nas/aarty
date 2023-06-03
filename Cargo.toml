@@ -1,6 +1,6 @@
 [package]
 name = "aarty"
-version = "0.4.7"
+version = "0.4.8"
 edition = "2021"
 authors = ["Anas Elgarhy <anas.elgarhy.dev@gmail.com>"]
 description = "A simple CLI tool to convert the images to ASCII art"
