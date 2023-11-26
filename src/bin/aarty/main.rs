@@ -1,7 +1,8 @@
+use std::io::Write;
+
+use aarty::ToTextImage;
 use clap::Parser;
 use image::GenericImageView;
-
-use std::io::Result;
 
 extern crate pretty_env_logger;
 
@@ -9,14 +10,12 @@ extern crate pretty_env_logger;
 extern crate log;
 
 mod args;
-mod ascii_processor;
 mod output;
 
+use crate::args::enums::Mode;
 use crate::args::{args::Arguments, enums::OutputMethod};
 
-use crate::ascii_processor::generate_ascii;
-
-fn main() -> Result<()> {
+fn main() -> std::io::Result<()> {
     // Initialize the logger
     pretty_env_logger::init();
     info!("Successfully initialized logger");
@@ -48,9 +47,31 @@ fn main() -> Result<()> {
         }
     };
     info!("Successfully opened image");
+    let (w, h) = image.dimensions();
     trace!("Image dimensions: {:?}", image.dimensions());
+    let image = image.resize(w, h / 3, image::imageops::FilterType::Nearest);
 
-    generate_ascii(image, &arguments, output::prepare_output(&arguments)?)?;
+    let mut image = image.to_text(arguments.characters.chars().collect());
+
+    if let Some(_) = &arguments.background {
+        // TODO: parse the color like `lanterna`
+        image = image.with_background((255, 208, 187));
+    }
+
+    image.no_colors = arguments.mode == Mode::NormalAscii;
+    image.reverse = true;
+
+    let mut out = output::prepare_output(&arguments)?;
+
+    out.write_all(image.to_string().as_bytes())?;
+    // convert_image_to_ascii(
+    //     image,
+    //     arguments.mode == Mode::Colored,
+    //     arguments.background.clone(),
+    //     arguments.characters.chars().collect(),
+    //     arguments.width.unwrap_or(arguments.scale),
+    //     &mut output::prepare_output(&arguments)?,
+    // )?;
     info!("Successfully processed image");
     Ok(())
 }
