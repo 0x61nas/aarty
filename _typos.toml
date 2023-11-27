@@ -1,0 +1,70 @@
+[files]
+extend-exclude = []
+ignore-hidden = false
+ignore-files = true
+ignore-dot = true
+ignore-vcs = true
+ignore-global = true
+ignore-parent = true
+
+[default]
+binary = false
+check-filename = true
+check-file = true
+unicode = true
+ignore-hex = true
+identifier-leading-digits = false
+locale = "en"
+extend-ignore-identifiers-re = []
+extend-ignore-words-re = []
+extend-ignore-re = []
+
+[default.extend-identifiers]
+
+[default.extend-words]
+
+[type.lock]
+extend-glob = []
+check-file = false
+extend-ignore-re = []
+
+[type.sh]
+extend-glob = []
+extend-ignore-identifiers-re = []
+extend-ignore-words-re = []
+extend-ignore-re = []
+
+[type.sh.extend-identifiers]
+ot = "ot"
+stap = "stap"
+
+[type.sh.extend-words]
+
+[type.rust]
+extend-glob = []
+extend-ignore-identifiers-re = []
+extend-ignore-words-re = []
+extend-ignore-re = []
+
+[type.rust.extend-identifiers]
+flate2 = "flate2"
+
+[type.rust.extend-words]
+ser = "ser"
+
+[type.cert]
+extend-glob = []
+check-file = false
+extend-ignore-re = []
+
+[type.man]
+extend-glob = []
+extend-ignore-identifiers-re = []
+extend-ignore-words-re = []
+extend-ignore-re = []
+
+[type.man.extend-identifiers]
+Nd = "Nd"
+
+[type.man.extend-words]
+
