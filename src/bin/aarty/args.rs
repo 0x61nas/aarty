@@ -1,71 +1,91 @@
-pub mod args {
-    use super::enums::*;
-    use clap::{arg, ColorChoice, Parser};
+use std::env;
 
-    #[derive(Parser, Debug)]
-    #[command(author, version, about, long_about = None, color = ColorChoice::Always)]
-    pub struct Arguments {
-        /// The art mode to use
-        #[arg(short, long, default_value = "normal-ascii")]
-        pub mode: Mode,
-        #[arg(long, default_value = "stdout", alias = "mo")]
-        pub output_method: OutputMethod,
-        /// The image to convert to ASCII art
-        pub image: String,
-        /// The character to use for drawing the image (lighter to darker)
-        /// You can user one character if you uses the color mode
-        #[arg(short, long, default_value = " .,-~!;:=*&%$@#")]
-        pub characters: String,
-        /// The output scale (1 is the original size)
-        #[arg(short, long, default_value = "4")]
-        pub scale: u32,
-        /// Enstablish how much wide is the output images, in columns. Overrides `scale`
-        #[arg(short, long, default_value= None )]
-        pub width: Option<u32>,
-        /// The background color to use
-        #[arg(short, long, default_value = None)]
-        pub background: Option<String>,
-        /// The output file to write to (if output_method is file)
-        #[arg(short, long, default_value = "ascii_image.txt")]
-        pub output: String,
-    }
+pub struct Opts {
+    /// The image to convert to ASCII art
+    pub path: String,
+    /// The character to use for drawing the image (lighter to darker)
+    /// You can user one character if you uses the color mode
+    pub sym_set: Vec<char>,
+    /// The output scale (1 is the original size)
+    pub scale: u32,
+    /// Enstablish how much wide is the output images, in columns. Overrides `scale`
+    pub width: Option<u32>,
+    pub height: Option<u32>,
+    /// The background color to use
+    pub background: Option<String>,
+    pub reverse: bool,
+    pub colors: bool,
+}
 
-    impl Arguments {
-        pub fn validate(&self) -> Result<(), String> {
-            if self.characters.is_empty() {
-                return Err("No characters provided".to_string());
-            } else if self.characters.len() == 1 {
-                if self.mode == Mode::NormalAscii {
-                    return Err("One character provided but mode is normal-ascii".to_string());
-                }
-            } else if self.characters.len() > 32 {
-                return Err("Too many characters provided, max is 32".to_string());
-            }
-            Ok(())
+impl Opts {
+    pub fn from_args() -> Result<Opts, String> {
+        let mut args = env::args().skip(1);
+        let mut opts = Opts::default();
+
+        macro_rules! err {
+            ($arg:ident) => {
+                format!("Expected one argument after {}, found 0.", $arg)
+            };
+            (parse; $item:expr, $error:ident) => {
+                format!("Can't parse the provided {}, because `{}`", $item, $error)
+            };
         }
+
+        macro_rules! value {
+            ($arg:ident) => {
+                args.next().ok_or(err!($arg))
+            };
+            (parse; $name:expr, $arg:ident) => {
+                args
+                    .next()
+                    .ok_or(err!($arg))?
+                    .parse()
+                    .map_err(|e| err!(parse; $name, e))
+            }
+        }
+
+        while let Some(arg) = args.next() {
+            if !arg.starts_with('-') {
+                opts.path = arg.clone();
+                continue;
+            }
+            let arg = arg.trim_start_matches('-');
+            match arg {
+                "c" | "sympols" | "chars" => opts.sym_set = value!(arg)?.chars().collect(),
+                "s" | "scale" => opts.scale = value!(parse; "scale", arg)?,
+                "w" | "col" | "columans" | "width" => {
+                    opts.width = Some(value!(parse; "width", arg)?)
+                }
+                "h" | "row" | "rows" | "height" => {
+                    opts.height = Some(value!(parse; "height", arg)?)
+                }
+                "b" | "back" | "background" => opts.background = Some(value!(arg)?),
+                "r" | "reverse" => opts.reverse = true,
+                "u" | "color" | "colors" => opts.colors = true,
+                unknown => return Err(format!("Unknown opthion {unknown}")),
+            }
+        }
+
+        if opts.path.is_empty() {
+            return Err("You must provide the image path/name".to_string());
+        }
+        Ok(opts)
     }
 }
 
-pub mod enums {
-    use clap::ValueEnum;
-
-    #[derive(Copy, Clone, ValueEnum, Debug, PartialOrd, Eq, PartialEq)]
-    pub enum Mode {
-        /// Normal ASCII art
-        #[clap(alias = "n")]
-        NormalAscii,
-        /// Colored ASCII art, the colors are based on the terminal colors
-        #[clap(alias = "c")]
-        Colored,
-    }
-
-    #[derive(Copy, Clone, ValueEnum, Debug, PartialOrd, Eq, PartialEq)]
-    pub enum OutputMethod {
-        /// Save the ascii art to a file
-        #[clap(alias = "f")]
-        File,
-        /// Print the ascii art to the terminal
-        #[clap(alias = "s")]
-        Stdout,
+impl Default for Opts {
+    fn default() -> Self {
+        Opts {
+            path: String::with_capacity(0),
+            sym_set: vec![
+                ' ', '.', ',', '-', '~', '!', ';', ':', '=', '*', '&', '%', '$', '@', '#',
+            ],
+            scale: 4,
+            width: None,
+            height: None,
+            background: None,
+            reverse: false,
+            colors: false,
+        }
     }
 }

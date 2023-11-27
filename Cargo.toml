@@ -33,7 +33,6 @@ name = "aarty"
 path = "src/bin/aarty/main.rs"
 
 [dependencies]
-clap = { version = "4.3.21", features = ["derive"] }
 colored = "2.0.4"
 image = "0.24.7"
 log = "0.4.20"
