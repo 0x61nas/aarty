@@ -8,6 +8,7 @@ pub(crate) const ANSI_BACKGROUND_ESCAPE: &str = "\u{001b}[48;2;";
 const ANSI_COLOR_CODE_LEN: usize = 12;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Color {
     /// Red.
     pub r: u8,

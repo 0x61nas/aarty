@@ -10,6 +10,7 @@ use std::fmt::{self, Display};
 
 /// Represent the ASCII art.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TextImage {
     #[cfg(feature = "colors")]
     bc: Option<Color>,
@@ -138,6 +139,7 @@ impl Display for TextImage {
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 struct Fragment {
     ch: char,
     #[cfg(feature = "colors")]
