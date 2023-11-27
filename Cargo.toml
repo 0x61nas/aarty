@@ -31,7 +31,7 @@ exclude = ["images/*"]
 
 [[bin]]
 name = "aarty"
-path = "src/bin/aarty/main.rs"
+path = "src/bin/main.rs"
 
 [dependencies]
 colored = "2.0.4"
