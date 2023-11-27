@@ -8,18 +8,9 @@ use image::{imageops::FilterType, GenericImageView};
 
 use crate::args::Opts;
 
-extern crate pretty_env_logger;
-
-#[macro_use]
-extern crate log;
-
 mod args;
 
 fn main() {
-    // Initialize the logger
-    pretty_env_logger::init();
-    info!("Successfully initialized logger");
-    info!("Parsing arguments");
     // Parse the arguments
     let opts = match Opts::from_args() {
         Ok(opts) => opts,
@@ -36,7 +27,6 @@ fn main() {
             process::exit(2);
         }
     };
-    info!("Successfully opened image");
     let (mut w, mut h) = image.dimensions();
     let mut sf = 0b11u8;
     if let Some(width) = opts.width {
