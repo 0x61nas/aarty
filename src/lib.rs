@@ -42,6 +42,11 @@ impl TextImage {
     }
 
     #[inline(always)]
+    pub fn len(&self) -> usize {
+        self.fragments.len()
+    }
+
+    #[inline(always)]
     fn _background(&self, f: &mut fmt::Formatter<'_>) -> std::result::Result<bool, fmt::Error> {
         if let Some(bc) = &self.bc {
             write!(f, "{ANSI_BACKGROUND_ESCAPE}{bc}m")?;
