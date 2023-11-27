@@ -47,6 +47,11 @@ impl TextImage {
     }
 
     #[inline(always)]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    #[inline(always)]
     fn _background(&self, f: &mut fmt::Formatter<'_>) -> std::result::Result<bool, fmt::Error> {
         if let Some(bc) = &self.bc {
             write!(f, "{ANSI_BACKGROUND_ESCAPE}{bc}m")?;
