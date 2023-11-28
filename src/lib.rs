@@ -162,7 +162,7 @@ impl Fragment {
 
 /// Trait to convert an imgae to ASCII art.
 pub trait ToTextImage {
-    fn to_text(&self, set: Vec<char>) -> TextImage;
+    fn to_text(&self, set: &[char]) -> TextImage;
 }
 
 impl<T, P> ToTextImage for T
@@ -171,7 +171,7 @@ where
     P: Into<Color> + Pixel<Subpixel = u8>,
 {
     #[inline(always)]
-    fn to_text(&self, set: Vec<char>) -> TextImage {
+    fn to_text(&self, set: &[char]) -> TextImage {
         crate::convert_image_to_ascii(self, set)
     }
 }
@@ -184,7 +184,7 @@ where
 /// #Arguments
 /// - image: The image to convert.
 /// - set: the ASCII sympols to draw the image with (from lighter to darker)
-pub fn convert_image_to_ascii<I, P>(image: &I, set: Vec<char>) -> TextImage
+pub fn convert_image_to_ascii<I, P>(image: &I, set: &[char]) -> TextImage
 where
     I: GenericImageView<Pixel = P>,
     P: Into<Color> + Pixel<Subpixel = u8>,
@@ -196,10 +196,10 @@ where
         for x in 0..width {
             let pixel = Pixel::to_rgba(&image.get_pixel(x, y));
             #[cfg(not(feature = "colors"))]
-            fragments.push(Fragment::new(get_character(pixel, &set)));
+            fragments.push(Fragment::new(get_character(pixel, set)));
 
             #[cfg(feature = "colors")]
-            fragments.push(Fragment::new(get_character(pixel, &set), pixel.into()));
+            fragments.push(Fragment::new(get_character(pixel, set), pixel.into()));
         }
     }
 
@@ -215,7 +215,7 @@ where
 }
 
 #[inline(always)]
-fn get_character(pixel: Rgba<u8>, characters: &Vec<char>) -> char {
+fn get_character(pixel: Rgba<u8>, characters: &[char]) -> char {
     // TODO: handle the zeros case
     let intent = if pixel[3] == 0 {
         0
