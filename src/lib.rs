@@ -1,7 +1,7 @@
 #[cfg(feature = "colors")]
 pub mod color;
-
-use image::{GenericImageView, Pixel, Rgba};
+#[cfg(feature = "image")]
+pub mod impl_image;
 
 #[cfg(feature = "colors")]
 use color::{Color, ANSI_BACKGROUND_ESCAPE, ANSI_ESCAPE_CLOSE, ANSI_FOREGROUND_ESCAPE};
@@ -165,15 +165,30 @@ pub trait ToTextImage {
     fn to_text(&self, set: &[char]) -> TextImage;
 }
 
-impl<T, P> ToTextImage for T
+impl<T> ToTextImage for T
 where
-    T: GenericImageView<Pixel = P>,
-    P: Into<Color> + Pixel<Subpixel = u8>,
+    T: PixelImage,
 {
     #[inline(always)]
     fn to_text(&self, set: &[char]) -> TextImage {
         crate::convert_image_to_ascii(self, set)
     }
+}
+
+pub trait PixelImage {
+    fn dimensions(&self) -> (u32, u32);
+    #[cfg(feature = "colors")]
+    fn get_pixel(&self, x: u32, y: u32) -> Rgba;
+}
+
+#[cfg(feature = "colors")]
+#[derive(Debug, PartialEq, PartialOrd, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Rgba {
+    r: u8,
+    g: u8,
+    b: u8,
+    a: u8,
 }
 
 /// Covert the image into ASCII art.
@@ -184,22 +199,24 @@ where
 /// #Arguments
 /// - image: The image to convert.
 /// - set: the ASCII sympols to draw the image with (from lighter to darker)
-pub fn convert_image_to_ascii<I, P>(image: &I, set: &[char]) -> TextImage
+pub fn convert_image_to_ascii<I>(image: &I, set: &[char]) -> TextImage
 where
-    I: GenericImageView<Pixel = P>,
-    P: Into<Color> + Pixel<Subpixel = u8>,
+    I: PixelImage,
 {
     let (width, height) = image.dimensions();
     let frag_cap = (width * height) as usize;
     let mut fragments = Vec::with_capacity(frag_cap);
     for y in 0..height {
         for x in 0..width {
-            let pixel = Pixel::to_rgba(&image.get_pixel(x, y));
+            let pixel = image.get_pixel(x, y);
             #[cfg(not(feature = "colors"))]
             fragments.push(Fragment::new(get_character(pixel, set)));
 
             #[cfg(feature = "colors")]
-            fragments.push(Fragment::new(get_character(pixel, set), pixel.into()));
+            fragments.push(Fragment::new(
+                get_character(pixel.clone(), set),
+                pixel.into(),
+            ));
         }
     }
     // make sure that the `fragments` vec didn't grow up (debug only)
@@ -217,20 +234,20 @@ where
 }
 
 #[inline(always)]
-fn get_character(pixel: Rgba<u8>, characters: &[char]) -> char {
+fn get_character(pixel: Rgba, characters: &[char]) -> char {
     if characters.is_empty() {
         return ' ';
     }
-    let intent = if pixel[3] == 0 {
+    let intent = if pixel.a == 0 {
         0
     } else {
-        pixel[0] / 3 + pixel[1] / 3 + pixel[2] / 3
+        pixel.r / 3 + pixel.g / 3 + pixel.b / 3
     } as usize;
 
     if intent == 0 {
         return characters[0];
     }
 
-    // I'll gonna kill my self if this didn't work.
+    // I'll kill my self if this didn't work.
     characters[intent % characters.len()]
 }

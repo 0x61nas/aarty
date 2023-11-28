@@ -1,6 +1,6 @@
 use std::{fmt::Display, ops::Index};
 
-use image::{Rgb, Rgba};
+use crate::Rgba;
 
 pub(crate) const ANSI_ESCAPE_CLOSE: &str = "\u{001b}[0m";
 pub(crate) const ANSI_FOREGROUND_ESCAPE: &str = "\u{001b}[38;2;";
@@ -58,26 +58,6 @@ impl Display for Color {
     }
 }
 
-impl From<Rgb<u8>> for Color {
-    fn from(value: Rgb<u8>) -> Self {
-        Color {
-            r: value[0],
-            g: value[1],
-            b: value[2],
-        }
-    }
-}
-
-impl From<Rgba<u8>> for Color {
-    fn from(value: Rgba<u8>) -> Self {
-        Color {
-            r: value[0],
-            g: value[1],
-            b: value[2],
-        }
-    }
-}
-
 impl<T> From<(T, T, T)> for Color
 where
     T: Into<u8>,
@@ -88,5 +68,13 @@ where
             g: v.1.into(),
             b: v.2.into(),
         }
+    }
+}
+
+impl From<Rgba> for Color {
+    #[inline(always)]
+    fn from(value: Rgba) -> Self {
+        let Rgba { r, g, b, .. } = value;
+        Color { r, g, b }
     }
 }

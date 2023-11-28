@@ -34,10 +34,10 @@ name = "aarty"
 path = "src/bin/main.rs"
 
 [dependencies]
-image = "0.24"
-serde ={ version = "1", features = ["derive"], optional = true }
+image = { version = "0.24", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
 
 [features]
-default = ["colors", "reverse"]
+default = ["colors", "reverse", "image"]
 colors = []
 reverse = []
