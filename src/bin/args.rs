@@ -1,5 +1,8 @@
 use std::env;
 
+const REVERSE: u8 = 0b1;
+const CORORS: u8 = 0b10;
+
 pub struct Opts {
     /// The image to convert to ASCII art
     pub path: String,
@@ -13,8 +16,7 @@ pub struct Opts {
     pub height: Option<u32>,
     /// The background color to use
     pub background: Option<String>,
-    pub reverse: bool,
-    pub colors: bool,
+    flags: u8,
 }
 
 impl Opts {
@@ -60,8 +62,8 @@ impl Opts {
                     opts.height = Some(value!(parse; "height", arg)?)
                 }
                 "b" | "back" | "background" => opts.background = Some(value!(arg)?),
-                "r" | "reverse" => opts.reverse = true,
-                "u" | "color" | "colors" => opts.colors = true,
+                "r" | "reverse" => opts.flags |= REVERSE,
+                "u" | "color" | "colors" => opts.flags |= CORORS,
                 unknown => return Err(format!("Unknown opthion {unknown}")),
             }
         }
@@ -70,6 +72,16 @@ impl Opts {
             return Err("You must provide the image path/name".to_string());
         }
         Ok(opts)
+    }
+
+    #[inline(always)]
+    pub fn reverse(&self) -> bool {
+        self.flags & REVERSE != 0
+    }
+
+    #[inline(always)]
+    pub fn no_colors(&self) -> bool {
+        self.flags & CORORS == 0
     }
 }
 
@@ -84,8 +96,7 @@ impl Default for Opts {
             width: None,
             height: None,
             background: None,
-            reverse: false,
-            colors: false,
+            flags: 0,
         }
     }
 }

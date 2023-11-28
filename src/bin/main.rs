@@ -48,15 +48,15 @@ fn main() {
     }
     let image = image.resize(w, h, FilterType::Nearest);
 
-    let mut image = image.to_text(opts.sym_set);
+    let mut image = image.to_text(&opts.sym_set);
 
     if let Some(_) = &opts.background {
         // TODO: parse the color like `lanterna`
         image = image.with_background((255, 208, 187));
     }
 
-    image.no_colors = !opts.colors;
-    image.reverse = opts.reverse;
+    image.no_colors = opts.no_colors();
+    image.reverse = opts.reverse();
 
     let image = image.to_string();
     let bytes = image.as_bytes();
