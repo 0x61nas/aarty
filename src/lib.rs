@@ -190,8 +190,8 @@ where
     P: Into<Color> + Pixel<Subpixel = u8>,
 {
     let (width, height) = image.dimensions();
-    // TODO: make sure that the _capacity_ are correct
-    let mut fragments = Vec::with_capacity((width * height) as usize);
+    let frag_cap = (width * height) as usize;
+    let mut fragments = Vec::with_capacity(frag_cap);
     for y in 0..height {
         for x in 0..width {
             let pixel = Pixel::to_rgba(&image.get_pixel(x, y));
@@ -202,6 +202,8 @@ where
             fragments.push(Fragment::new(get_character(pixel, set), pixel.into()));
         }
     }
+    // make sure that the `fragments` vec didn't grow up (debug only)
+    debug_assert_eq!(fragments.capacity(), frag_cap);
 
     TextImage {
         fragments,
@@ -216,12 +218,19 @@ where
 
 #[inline(always)]
 fn get_character(pixel: Rgba<u8>, characters: &[char]) -> char {
-    // TODO: handle the zeros case
+    if characters.is_empty() {
+        return ' ';
+    }
     let intent = if pixel[3] == 0 {
         0
     } else {
         pixel[0] / 3 + pixel[1] / 3 + pixel[2] / 3
-    };
+    } as usize;
 
-    characters[(intent / (32 + 7 - (7 + (characters.len() - 7)) as u8)) as usize]
+    if intent == 0 {
+        return characters[0];
+    }
+
+    // I'll gonna kill my self if this didn't work.
+    characters[intent % characters.len()]
 }
