@@ -4,7 +4,7 @@ pub mod color;
 pub mod impl_image;
 
 #[cfg(feature = "colors")]
-use color::{Color, ANSI_BACKGROUND_ESCAPE, ANSI_ESCAPE_CLOSE, ANSI_FOREGROUND_ESCAPE};
+use color::ANSIColor;
 
 use std::fmt::{self, Display};
 
@@ -13,7 +13,7 @@ use std::fmt::{self, Display};
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TextImage {
     #[cfg(feature = "colors")]
-    bc: Option<Color>,
+    bc: Option<ANSIColor>,
     fragments: Vec<Fragment>,
     /// The columans number.
     pub row_len: usize,
@@ -37,7 +37,7 @@ impl TextImage {
     ///
     ///```
     #[inline(always)]
-    pub fn with_background<C: Into<Color>>(mut self, bc: C) -> Self {
+    pub fn with_background<C: Into<ANSIColor>>(mut self, bc: C) -> Self {
         self.bc = Some(bc.into());
         self
     }
@@ -55,7 +55,7 @@ impl TextImage {
     #[inline(always)]
     fn _background(&self, f: &mut fmt::Formatter<'_>) -> std::result::Result<bool, fmt::Error> {
         if let Some(bc) = &self.bc {
-            write!(f, "{ANSI_BACKGROUND_ESCAPE}{bc}m")?;
+            write!(f, "{bc:-}")?;
             return Ok(true);
         }
         Ok(false)
@@ -64,13 +64,17 @@ impl TextImage {
     #[cfg(feature = "colors")]
     #[inline]
     fn _color_fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use color::ANSI_ESCAPE_CLOSE;
+
         let has_background = {
             #[cfg(feature = "reverse")]
             if self.reverse {
                 let mut r = false;
                 if let Some(bc) = &self.bc {
-                    write!(f, "{ANSI_FOREGROUND_ESCAPE}{bc}m")?;
-                    r = true;
+                    if !bc.is_transparent() {
+                        write!(f, "{bc}")?;
+                        r = true;
+                    }
                 }
                 r
             } else {
@@ -90,12 +94,12 @@ impl TextImage {
 
             #[cfg(feature = "reverse")]
             if self.reverse {
-                write!(f, "{ANSI_BACKGROUND_ESCAPE}{bc}m", bc = frag.fg)?;
+                write!(f, "{c:-}", c = frag.fg)
             } else {
-                write!(f, "{ANSI_FOREGROUND_ESCAPE}{fg}m", fg = frag.fg)?;
-            }
+                write!(f, "{c}", c = frag.fg)
+            }?;
             #[cfg(not(feature = "reverse"))]
-            write!(f, "{ANSI_FOREGROUND_ESCAPE}{fg}m", fg = frag.fg)?;
+            write!(f, "{c}", c = frag.fg)?;
 
             write!(f, "{ch}{ANSI_ESCAPE_CLOSE}", ch = frag.ch)?;
         }
@@ -143,7 +147,7 @@ impl Display for TextImage {
 struct Fragment {
     ch: char,
     #[cfg(feature = "colors")]
-    fg: Color,
+    fg: ANSIColor,
 }
 
 impl Fragment {
@@ -155,7 +159,7 @@ impl Fragment {
 
     #[cfg(feature = "colors")]
     #[inline(always)]
-    fn new(ch: char, fc: Color) -> Fragment {
+    fn new(ch: char, fc: ANSIColor) -> Fragment {
         Fragment { ch, fg: fc }
     }
 }
