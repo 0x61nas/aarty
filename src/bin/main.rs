@@ -34,7 +34,7 @@ fn main() {
         }
         .decode()
     } else {
-        const CAPACITY: usize = 1024 * 2; // 2mb
+        const CAPACITY: usize = 2 * 1048576; // 2mb
         let mut buf = Vec::with_capacity(CAPACITY);
         if let Err(e) = io::stdin().lock().read_to_end(&mut buf) {
             eprintln!("{e}");
