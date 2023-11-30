@@ -4,7 +4,7 @@ use aarty::{COLORS, REVERSE};
 
 pub struct Opts {
     /// The image to convert to ASCII art
-    pub path: String,
+    pub path: Option<String>,
     /// The character to use for drawing the image (lighter to darker)
     /// You can user one character if you uses the color mode
     pub sym_set: Vec<char>,
@@ -47,7 +47,7 @@ impl Opts {
 
         while let Some(arg) = args.next() {
             if !arg.starts_with('-') {
-                opts.path = arg.clone();
+                opts.path = Some(arg);
                 continue;
             }
             let arg = arg.trim_start_matches('-');
@@ -67,9 +67,6 @@ impl Opts {
             }
         }
 
-        if opts.path.is_empty() {
-            return Err("You must provide the image path/name".to_string());
-        }
         Ok(opts)
     }
 }
@@ -77,7 +74,7 @@ impl Opts {
 impl Default for Opts {
     fn default() -> Self {
         Opts {
-            path: String::with_capacity(0),
+            path: None,
             sym_set: vec![
                 ' ', '.', ',', '-', '~', '!', ';', ':', '=', '*', '&', '%', '$', '@', '#',
             ],
