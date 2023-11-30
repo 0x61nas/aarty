@@ -11,7 +11,8 @@ use std::fmt::{self, Display};
 /// Represent the ASCII art.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct TextImage {
+pub struct TextImage<'a> {
+    pub set: &'a Vec<char>,
     #[cfg(feature = "colors")]
     bc: Option<ANSIColor>,
     fragments: Vec<Fragment>,
@@ -25,7 +26,7 @@ pub struct TextImage {
     pub reverse: bool,
 }
 
-impl TextImage {
+impl TextImage<'_> {
     /// Set the background color.
     ///
     /// # Examples
@@ -101,7 +102,11 @@ impl TextImage {
             #[cfg(not(feature = "reverse"))]
             write!(f, "{c}", c = frag.fg)?;
 
-            write!(f, "{ch}{ANSI_ESCAPE_CLOSE}", ch = frag.ch)?;
+            write!(
+                f,
+                "{ch}{ANSI_ESCAPE_CLOSE}",
+                ch = self.set[frag.ch_index as usize]
+            )?;
         }
 
         if has_background {
@@ -120,13 +125,13 @@ impl TextImage {
                 i = 0;
                 writeln!(f)?;
             }
-            f.write_str(&frag.ch.to_string())?;
+            f.write_str(&self.set[frag.ch_index as usize].to_string())?;
         }
         Ok(())
     }
 }
 
-impl Display for TextImage {
+impl Display for TextImage<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         #[cfg(feature = "colors")]
         {
@@ -145,7 +150,7 @@ impl Display for TextImage {
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 struct Fragment {
-    ch: char,
+    ch_index: u8,
     #[cfg(feature = "colors")]
     fg: ANSIColor,
 }
@@ -153,20 +158,20 @@ struct Fragment {
 impl Fragment {
     #[cfg(not(feature = "colors"))]
     #[inline(always)]
-    fn new(ch: char) -> Fragment {
-        Fragment { ch }
+    fn new(ch_index: u8) -> Fragment {
+        Fragment { ch_index }
     }
 
     #[cfg(feature = "colors")]
     #[inline(always)]
-    fn new(ch: char, fc: ANSIColor) -> Fragment {
-        Fragment { ch, fg: fc }
+    fn new(ch_index: u8, fc: ANSIColor) -> Fragment {
+        Fragment { ch_index, fg: fc }
     }
 }
 
 /// Trait to convert an imgae to ASCII art.
 pub trait ToTextImage {
-    fn to_text(&self, set: &[char]) -> TextImage;
+    fn to_text<'a>(&self, set: &'a Vec<char>) -> TextImage<'a>;
 }
 
 impl<T> ToTextImage for T
@@ -174,7 +179,7 @@ where
     T: PixelImage,
 {
     #[inline(always)]
-    fn to_text(&self, set: &[char]) -> TextImage {
+    fn to_text<'a>(&self, set: &'a Vec<char>) -> TextImage<'a> {
         crate::convert_image_to_ascii(self, set)
     }
 }
@@ -203,7 +208,7 @@ pub struct Rgba {
 /// #Arguments
 /// - image: The image to convert.
 /// - set: the ASCII sympols to draw the image with (from lighter to darker)
-pub fn convert_image_to_ascii<I>(image: &I, set: &[char]) -> TextImage
+pub fn convert_image_to_ascii<'a, I>(image: &I, set: &'a Vec<char>) -> TextImage<'a>
 where
     I: PixelImage,
 {
@@ -227,6 +232,7 @@ where
     debug_assert_eq!(fragments.capacity(), frag_cap);
 
     TextImage {
+        set,
         fragments,
         #[cfg(feature = "colors")]
         bc: None,
@@ -238,20 +244,20 @@ where
 }
 
 #[inline(always)]
-fn get_character(pixel: Rgba, characters: &[char]) -> char {
+fn get_character(pixel: Rgba, characters: &[char]) -> u8 {
     if characters.is_empty() {
-        return ' ';
+        panic!("The set can't be empty"); // TODO: handle this
     }
     let intent = if pixel.a == 0 {
         0
     } else {
         pixel.r / 3 + pixel.g / 3 + pixel.b / 3
-    } as usize;
+    };
 
     if intent == 0 {
-        return characters[0];
+        return 0;
     }
 
     // I'll kill my self if this didn't work.
-    characters[intent % characters.len()]
+    intent % characters.len() as u8
 }
