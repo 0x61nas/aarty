@@ -8,6 +8,11 @@ use color::ANSIColor;
 
 use std::fmt::{self, Display};
 
+/// Use colos.
+pub const COLORS: u8 = 0b1;
+/// Reverse the forgruond color with the background.
+pub const REVERSE: u8 = 0b10;
+
 /// Represent the ASCII art.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -18,12 +23,7 @@ pub struct TextImage<'a> {
     fragments: Vec<Fragment>,
     /// The columans number.
     pub row_len: usize,
-    /// Don't use colors.
-    #[cfg(feature = "colors")]
-    pub no_colors: bool,
-    /// Reverse the forgruond color with the background.
-    #[cfg(feature = "reverse")]
-    pub reverse: bool,
+    pub flags: u8,
 }
 
 impl TextImage<'_> {
@@ -54,6 +54,16 @@ impl TextImage<'_> {
     }
 
     #[inline(always)]
+    pub fn reverse(&self) -> bool {
+        self.flags & REVERSE == REVERSE
+    }
+
+    #[inline(always)]
+    pub fn colors(&self) -> bool {
+        self.flags & COLORS == COLORS
+    }
+
+    #[inline(always)]
     fn _background(&self, f: &mut fmt::Formatter<'_>) -> std::result::Result<bool, fmt::Error> {
         if let Some(bc) = &self.bc {
             write!(f, "{bc:-}")?;
@@ -69,7 +79,7 @@ impl TextImage<'_> {
 
         let has_background = {
             #[cfg(feature = "reverse")]
-            if self.reverse {
+            if self.reverse() {
                 let mut r = false;
                 if let Some(bc) = &self.bc {
                     if !bc.is_transparent() {
@@ -94,7 +104,7 @@ impl TextImage<'_> {
             }
 
             #[cfg(feature = "reverse")]
-            if self.reverse {
+            if self.reverse() {
                 write!(f, "{c:-}", c = frag.fg)
             } else {
                 write!(f, "{c}", c = frag.fg)
@@ -135,10 +145,10 @@ impl Display for TextImage<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         #[cfg(feature = "colors")]
         {
-            if self.no_colors {
-                self._fmt(f)
-            } else {
+            if self.colors() {
                 self._color_fmt(f)
+            } else {
+                self._fmt(f)
             }
         }
 
@@ -237,9 +247,7 @@ where
         #[cfg(feature = "colors")]
         bc: None,
         row_len: width as usize,
-        no_colors: false,
-        #[cfg(feature = "reverse")]
-        reverse: false,
+        flags: 0,
     }
 }
 

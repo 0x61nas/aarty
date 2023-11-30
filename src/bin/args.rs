@@ -1,7 +1,7 @@
 use std::env;
 
 const REVERSE: u8 = 0b1;
-const CORORS: u8 = 0b10;
+const COLORS: u8 = 0b10;
 
 pub struct Opts {
     /// The image to convert to ASCII art
@@ -63,7 +63,7 @@ impl Opts {
                 }
                 "b" | "back" | "background" => opts.background = Some(value!(arg)?),
                 "r" | "reverse" => opts.flags |= REVERSE,
-                "u" | "color" | "colors" => opts.flags |= CORORS,
+                "u" | "color" | "colors" => opts.flags |= COLORS,
                 unknown => return Err(format!("Unknown opthion {unknown}")),
             }
         }
@@ -76,12 +76,12 @@ impl Opts {
 
     #[inline(always)]
     pub fn reverse(&self) -> bool {
-        self.flags & REVERSE != 0
+        self.flags & REVERSE == REVERSE
     }
 
     #[inline(always)]
-    pub fn no_colors(&self) -> bool {
-        self.flags & CORORS == 0
+    pub fn colors(&self) -> bool {
+        self.flags & COLORS == COLORS
     }
 }
 

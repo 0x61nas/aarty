@@ -3,7 +3,7 @@ use std::{
     process,
 };
 
-use aarty::ToTextImage;
+use aarty::{ToTextImage, COLORS, REVERSE};
 use image::{imageops::FilterType, GenericImageView};
 
 use crate::args::Opts;
@@ -55,8 +55,12 @@ fn main() {
         image = image.with_background((255, 208, 187));
     }
 
-    image.no_colors = opts.no_colors();
-    image.reverse = opts.reverse();
+    if opts.reverse() {
+        image.flags |= REVERSE;
+    }
+    if opts.colors() {
+        image.flags |= COLORS;
+    }
 
     let image = image.to_string();
     let bytes = image.as_bytes();
