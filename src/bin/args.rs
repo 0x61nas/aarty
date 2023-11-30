@@ -1,7 +1,6 @@
 use std::env;
 
-const REVERSE: u8 = 0b1;
-const COLORS: u8 = 0b10;
+use aarty::{COLORS, REVERSE};
 
 pub struct Opts {
     /// The image to convert to ASCII art
@@ -16,7 +15,7 @@ pub struct Opts {
     pub height: Option<u32>,
     /// The background color to use
     pub background: Option<String>,
-    flags: u8,
+    pub flags: u8,
 }
 
 impl Opts {
@@ -72,16 +71,6 @@ impl Opts {
             return Err("You must provide the image path/name".to_string());
         }
         Ok(opts)
-    }
-
-    #[inline(always)]
-    pub fn reverse(&self) -> bool {
-        self.flags & REVERSE == REVERSE
-    }
-
-    #[inline(always)]
-    pub fn colors(&self) -> bool {
-        self.flags & COLORS == COLORS
     }
 }
 
