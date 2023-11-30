@@ -1,10 +1,10 @@
 use std::{
-    io::{self, BufWriter, Write},
+    io::{self, BufWriter, Cursor, Read, Write},
     process,
 };
 
 use aarty::ToTextImage;
-use image::{imageops::FilterType, GenericImageView};
+use image::{imageops::FilterType, io::Reader, GenericImageView};
 
 use crate::args::Opts;
 
@@ -20,7 +20,22 @@ fn main() {
         }
     };
 
-    let image = match image::open(opts.path.clone()) {
+    let image = if let Some(path) = opts.path.as_ref() {
+        Reader::open(path)
+            .expect("Can't open the provide image")
+            .decode()
+    } else {
+        const CAPACITY: usize = 1024 * 2; // 2mb
+        let mut buf = Vec::with_capacity(CAPACITY);
+        let mut stdin = io::stdin().lock();
+        stdin.read_to_end(&mut buf).unwrap(); // TODO: you're know what's wrong!
+        Reader::new(Cursor::new(buf))
+            .with_guessed_format()
+            .unwrap()
+            .decode()
+    };
+
+    let image = match image {
         Ok(image) => image,
         Err(e) => {
             eprintln!("Failed to open image: {e}");
