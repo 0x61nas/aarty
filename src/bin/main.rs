@@ -10,38 +10,46 @@ use crate::args::Opts;
 
 mod args;
 
+const G_ERR: i32 = 1;
+const IO_ERR: i32 = 2;
+const OP_ERR: i32 = 3;
+
 fn main() {
     // Parse the arguments
     let opts = match Opts::from_args() {
         Ok(opts) => opts,
         Err(e) => {
-            eprintln!("Encounter an error while prasing the arguments\n{e}");
-            process::exit(1);
+            eprintln!("{e}");
+            process::exit(G_ERR);
         }
     };
 
-    let image = if let Some(path) = opts.path.as_ref() {
-        Reader::open(path)
-            .expect("Can't open the provide image")
-            .decode()
+    let Ok(image) = (if let Some(path) = opts.path.as_ref() {
+        match Reader::open(path) {
+            Ok(r) => r,
+            Err(e) => {
+                eprintln!("{e}");
+                process::exit(IO_ERR);
+            }
+        }
+        .decode()
     } else {
         const CAPACITY: usize = 1024 * 2; // 2mb
         let mut buf = Vec::with_capacity(CAPACITY);
-        let mut stdin = io::stdin().lock();
-        stdin.read_to_end(&mut buf).unwrap(); // TODO: you're know what's wrong!
-        Reader::new(Cursor::new(buf))
-            .with_guessed_format()
-            .unwrap()
-            .decode()
+        if let Err(e) = io::stdin().lock().read_to_end(&mut buf) {
+            eprintln!("{e}");
+            process::exit(IO_ERR);
+        }
+        let Ok(reader) = Reader::new(Cursor::new(buf)).with_guessed_format() else {
+            eprintln!("Can't read the input");
+            process::exit(IO_ERR);
+        };
+        reader.decode()
+    }) else {
+        eprintln!("Failed to guess the input format or the input format was unsportted");
+        process::exit(OP_ERR);
     };
 
-    let image = match image {
-        Ok(image) => image,
-        Err(e) => {
-            eprintln!("Failed to open image: {e}");
-            process::exit(2);
-        }
-    };
     let (mut w, mut h) = image.dimensions();
     let mut sf = 0b11u8;
     if let Some(width) = opts.width {
@@ -77,5 +85,8 @@ fn main() {
 
     let mut out = BufWriter::with_capacity(bytes.len(), Box::new(io::stdout().lock()));
 
-    out.write_all(bytes).expect("Can't write the output");
+    if let Err(e) = out.write_all(bytes) {
+        eprintln!("Can't write the output: {e}");
+        process::exit(IO_ERR);
+    }
 }
