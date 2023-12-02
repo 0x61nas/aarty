@@ -71,7 +71,11 @@ fn main() {
     }
     let image = image.resize(w, h, FilterType::Nearest);
 
-    let mut image = image.to_text(&opts.sym_set);
+    #[cfg(not(feature = "_no_ref"))]
+    let mut image = image.to_text((&opts.sym_set).into());
+
+    #[cfg(feature = "_no_ref")]
+    let mut image = image.to_text(opts.sym_set.into());
 
     if let Some(_) = &opts.background {
         // TODO: parse the color like `lanterna`

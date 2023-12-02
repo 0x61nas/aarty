@@ -2,9 +2,11 @@
 pub mod color;
 #[cfg(feature = "image")]
 pub mod impl_image;
+pub mod sympols;
 
 #[cfg(feature = "colors")]
 use color::ANSIColor;
+use sympols::Sympols;
 
 use std::fmt::{self, Display};
 
@@ -15,9 +17,9 @@ pub const REVERSE: u8 = 0b10;
 
 /// Represent the ASCII art.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "impl_serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TextImage<'a> {
-    pub set: &'a Vec<char>,
+    pub sympols: Sympols<'a>,
     #[cfg(feature = "colors")]
     bc: Option<ANSIColor>,
     fragments: Vec<Fragment>,
@@ -115,7 +117,7 @@ impl TextImage<'_> {
             write!(
                 f,
                 "{ch}{ANSI_ESCAPE_CLOSE}",
-                ch = self.set[frag.ch_index as usize]
+                ch = self.sympols.get(frag.ch_index as usize)
             )?;
         }
 
@@ -135,7 +137,7 @@ impl TextImage<'_> {
                 i = 0;
                 writeln!(f)?;
             }
-            f.write_str(&self.set[frag.ch_index as usize].to_string())?;
+            f.write_str(&self.sympols.get(frag.ch_index as usize).to_string())?;
         }
         Ok(())
     }
@@ -158,7 +160,7 @@ impl Display for TextImage<'_> {
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "impl_serde", derive(serde::Serialize, serde::Deserialize))]
 struct Fragment {
     ch_index: u8,
     #[cfg(feature = "colors")]
@@ -181,7 +183,7 @@ impl Fragment {
 
 /// Trait to convert an imgae to ASCII art.
 pub trait ToTextImage {
-    fn to_text<'a>(&self, set: &'a Vec<char>) -> TextImage<'a>;
+    fn to_text<'a>(&self, set: Sympols<'a>) -> TextImage<'a>;
 }
 
 impl<T> ToTextImage for T
@@ -189,7 +191,7 @@ where
     T: PixelImage,
 {
     #[inline(always)]
-    fn to_text<'a>(&self, set: &'a Vec<char>) -> TextImage<'a> {
+    fn to_text<'a>(&self, set: Sympols<'a>) -> TextImage<'a> {
         crate::convert_image_to_ascii(self, set)
     }
 }
@@ -202,7 +204,7 @@ pub trait PixelImage {
 
 #[cfg(feature = "colors")]
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "impl_serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Rgba {
     r: u8,
     g: u8,
@@ -218,7 +220,7 @@ pub struct Rgba {
 /// #Arguments
 /// - image: The image to convert.
 /// - set: the ASCII sympols to draw the image with (from lighter to darker)
-pub fn convert_image_to_ascii<'a, I>(image: &I, set: &'a Vec<char>) -> TextImage<'a>
+pub fn convert_image_to_ascii<'a, I>(image: &I, sympols: Sympols<'a>) -> TextImage<'a>
 where
     I: PixelImage,
 {
@@ -229,43 +231,21 @@ where
         for x in 0..width {
             let pixel = image.get_pixel(x, y);
             #[cfg(not(feature = "colors"))]
-            fragments.push(Fragment::new(get_character(pixel, set)));
+            fragments.push(Fragment::new(sympols.sym_index(&pixel) as u8));
 
             #[cfg(feature = "colors")]
-            fragments.push(Fragment::new(
-                get_character(pixel.clone(), set),
-                pixel.into(),
-            ));
+            fragments.push(Fragment::new(sympols.sym_index(&pixel) as u8, pixel.into()));
         }
     }
     // make sure that the `fragments` vec didn't grow up (debug only)
     debug_assert_eq!(fragments.capacity(), frag_cap);
 
     TextImage {
-        set,
+        sympols,
         fragments,
         #[cfg(feature = "colors")]
         bc: None,
         row_len: width as usize,
         flags: 0,
     }
-}
-
-#[inline(always)]
-fn get_character(pixel: Rgba, characters: &[char]) -> u8 {
-    if characters.is_empty() {
-        panic!("The set can't be empty"); // TODO: handle this
-    }
-    let intent = if pixel.a == 0 {
-        0
-    } else {
-        pixel.r / 3 + pixel.g / 3 + pixel.b / 3
-    };
-
-    if intent == 0 {
-        return 0;
-    }
-
-    // I'll kill my self if this didn't work.
-    intent % characters.len() as u8
 }
