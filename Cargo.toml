@@ -41,3 +41,5 @@ serde = { version = "1", features = ["derive"], optional = true }
 default = ["colors", "reverse", "image"]
 colors = []
 reverse = []
+impl_serde = ["serde", "_no_ref"]
+_no_ref = []
