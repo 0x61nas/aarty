@@ -99,11 +99,11 @@ impl TextImage<'_> {
 
         let mut i = 0;
         for frag in &self.fragments {
-            i += 1;
             if i == self.row_len {
                 i = 0;
                 writeln!(f)?;
             }
+            i += 1;
 
             #[cfg(feature = "reverse")]
             if self.reverse() {
@@ -132,12 +132,12 @@ impl TextImage<'_> {
     fn _fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut i = 0;
         for frag in &self.fragments {
-            i += 1;
             if i == self.row_len {
                 i = 0;
                 writeln!(f)?;
             }
             f.write_str(&self.sympols.get(frag.ch_index as usize).to_string())?;
+            i += 1;
         }
         Ok(())
     }
