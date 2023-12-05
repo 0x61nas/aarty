@@ -27,7 +27,7 @@ where
             r: value[0],
             g: value[1],
             b: value[2],
-            a: value[2],
+            a: value[3],
         }
     }
 }

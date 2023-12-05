@@ -42,18 +42,23 @@ impl Sympols<'_> {
         if self.is_empty() {
             return 0;
         }
+        let len = self.len();
         // FIXME: handle the alpha channel
-        let intent = if pixel.a == 0 {
-            0
-        } else {
-            pixel.r / 3 + pixel.g / 3 + pixel.b / 3
-        } as usize;
+        let mut idx = (pixel.r as usize + pixel.g as usize + pixel.b as usize) / 3;
 
-        if intent == 0 {
+        if idx == 0 {
             return 0;
         }
 
+        if pixel.a < 120 {
+            idx = pixel.a as usize % idx;
+        }
+
         // I'll kill my self if this didn't work.
-        intent % self.len()
+        idx /= 255 / len;
+        if idx >= len {
+            return len - 1;
+        }
+        idx
     }
 }

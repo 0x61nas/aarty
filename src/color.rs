@@ -64,7 +64,7 @@ impl From<Rgba> for ANSIColor {
     #[inline(always)]
     fn from(value: Rgba) -> Self {
         let Rgba { r, g, b, a } = value;
-        if a == 0 {
+        if a < 120 {
             return TRANSBARENT;
         }
         ANSIColor::new(r, g, b)
