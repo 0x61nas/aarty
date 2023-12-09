@@ -17,7 +17,7 @@ pub const REVERSE: u8 = 0b10;
 
 /// Represent the ASCII art.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
-#[cfg_attr(feature = "impl_serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TextImage<'a> {
     pub sympols: Sympols<'a>,
     #[cfg(feature = "colors")]
@@ -160,7 +160,7 @@ impl Display for TextImage<'_> {
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
-#[cfg_attr(feature = "impl_serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 struct Fragment {
     ch_index: u8,
     #[cfg(feature = "colors")]
@@ -204,7 +204,7 @@ pub trait PixelImage {
 
 #[cfg(feature = "colors")]
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
-#[cfg_attr(feature = "impl_serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Rgba {
     r: u8,
     g: u8,

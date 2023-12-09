@@ -8,7 +8,7 @@ pub mod ref_impl;
 const EMPTY_CHAR: char = ' ';
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
-#[cfg_attr(feature = "impl_serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Sympols<'a> {
     #[cfg(not(feature = "_no_ref"))]
     set: &'a [char],
