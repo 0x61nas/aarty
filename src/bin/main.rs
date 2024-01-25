@@ -3,7 +3,7 @@ use std::{
     process,
 };
 
-use aarty::ToTextImage;
+use aarty::{convert_image_to_ascii, Config, ToTextImage};
 use image::{imageops::FilterType, io::Reader, GenericImageView};
 
 use crate::args::Opts;
@@ -71,25 +71,40 @@ fn main() {
     }
     let image = image.resize(w, h, FilterType::Nearest);
 
-    #[cfg(not(feature = "_no_ref"))]
-    let mut image = image.to_text((&opts.sym_set).into());
+    let config = Config {
+        sympols: (&opts.sym_set).into(),
+        bc: {
+            if let Some(_) = &opts.background {
+                // TODO: parse the color like `lanterna`
+                Some((255, 208, 187).into())
+            } else {
+                None
+            }
+        },
+        flags: opts.flags,
+    };
 
-    #[cfg(feature = "_no_ref")]
-    let mut image = image.to_text(opts.sym_set.into());
+    let buf_size = config.calc_buf_size(w, h);
 
-    if let Some(_) = &opts.background {
-        // TODO: parse the color like `lanterna`
-        image = image.with_background((255, 208, 187));
-    }
+    // #[cfg(not(feature = "_no_ref"))]
+    // let mut image = image.to_text((&opts.sym_set).into());
 
-    image.flags |= opts.flags;
+    // #[cfg(feature = "_no_ref")]
+    // let mut image = image.to_text(opts.sym_set.into());
 
-    let image = image.to_string();
-    let bytes = image.as_bytes();
+    // if let Some(_) = &opts.background {
+    //     // TODO: parse the color like `lanterna`
+    //     image = image.with_background((255, 208, 187));
+    // }
 
-    let mut out = BufWriter::with_capacity(bytes.len(), Box::new(io::stdout().lock()));
+    // image.flags |= opts.flags;
 
-    if let Err(e) = out.write_all(bytes) {
+    // let image = image.to_string();
+    // let bytes = image.as_bytes();
+
+    let mut out = BufWriter::with_capacity(buf_size, Box::new(io::stdout().lock()));
+
+    if let Err(e) = convert_image_to_ascii(&config, &image, &mut out) {
         eprintln!("Can't write the output: {e}");
         process::exit(IO_ERR);
     }

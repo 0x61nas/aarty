@@ -7,7 +7,7 @@ pub mod ref_impl;
 
 const EMPTY_CHAR: char = ' ';
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Sympols<'a> {
     #[cfg(not(feature = "_no_ref"))]
@@ -20,7 +20,7 @@ pub struct Sympols<'a> {
 
 impl Sympols<'_> {
     #[inline(always)]
-    pub fn get(&self, i: usize) -> char {
+    pub const fn get(&self, i: usize) -> char {
         if self.is_empty() {
             return EMPTY_CHAR;
         }
@@ -28,17 +28,17 @@ impl Sympols<'_> {
     }
 
     #[inline(always)]
-    pub fn len(&self) -> usize {
+    pub const fn len(&self) -> usize {
         self.set.len()
     }
 
     #[inline(always)]
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         self.set.is_empty()
     }
 
     #[inline]
-    pub(crate) fn sym_index(&self, pixel: &Rgba) -> usize {
+    pub(crate) const fn sym_index(&self, pixel: &Rgba) -> usize {
         if self.is_empty() {
             return 0;
         }
@@ -60,5 +60,16 @@ impl Sympols<'_> {
             return len - 1;
         }
         idx
+    }
+
+    #[inline]
+    pub(crate) const fn sym(&self, pixel: &Rgba) -> char {
+        self.get(self.sym_index(pixel))
+    }
+
+    #[inline]
+    pub(crate) const fn sym_and_index(&self, pixel: &Rgba) -> (char, usize) {
+        let idx = self.sym_index(pixel);
+        (self.get(idx), idx)
     }
 }

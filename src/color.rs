@@ -3,14 +3,14 @@ use std::fmt::Display;
 use crate::Rgba;
 
 pub(crate) const ANSI_ESCAPE_CLOSE: &str = "\u{001b}[0m";
-const ANSI_FOREGROUND_ESCAPE: &str = "\u{001b}[38;2;";
-const ANSI_BACKGROUND_ESCAPE: &str = "\u{001b}[48;2;";
-const ANSI_COLOR_CODE_LEN: usize = 12;
-pub const TRANSBARENT: ANSIColor = ANSIColor {
+pub(crate) const ANSI_FOREGROUND_ESCAPE: &str = "\u{001b}[38;2;";
+pub(crate) const ANSI_BACKGROUND_ESCAPE: &str = "\u{001b}[48;2;";
+pub(crate) const ANSI_COLOR_CODE_LEN: usize = 12;
+pub(crate) const TRANSBARENT: ANSIColor = ANSIColor {
     inner: String::new(),
 };
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ANSIColor {
     inner: String,
@@ -34,6 +34,13 @@ impl ANSIColor {
     #[inline(always)]
     pub fn is_transparent(&self) -> bool {
         self.inner.is_empty()
+    }
+
+    pub fn as_background(&self) -> String {
+        format!("{ANSI_BACKGROUND_ESCAPE}{}m", self.inner)
+    }
+    pub fn as_foreground(&self) -> String {
+        format!("{ANSI_FOREGROUND_ESCAPE}{}m", self.inner)
     }
 }
 
