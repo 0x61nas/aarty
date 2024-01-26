@@ -33,7 +33,7 @@ check:
     committed aurora..HEAD --no-merge-commit
     cargo audit
     typos
-    # codespell --skip="target,git" --ignore-words="{{justfile_directory()}}/.codespellignore"
+    codespell --skip="target,git,_typos.toml" --ignore-words="{{justfile_directory()}}/.codespellignore"
 
 @lint:
     cargo fmt --all -- --check --verbose
