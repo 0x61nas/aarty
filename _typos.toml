@@ -1,5 +1,5 @@
 [files]
-extend-exclude = []
+extend-exclude = [".git"]
 ignore-hidden = false
 ignore-files = true
 ignore-dot = true
