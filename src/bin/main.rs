@@ -1,9 +1,9 @@
 use std::{
-    io::{self, BufWriter, Cursor, Read, Write},
+    io::{self, BufWriter, Cursor, Read},
     process,
 };
 
-use aarty::{convert_image_to_ascii, Config, ToTextImage};
+use aarty::{convert_image_to_ascii, Config};
 use image::{imageops::FilterType, io::Reader, GenericImageView};
 
 use crate::args::Opts;
@@ -72,7 +72,7 @@ fn main() {
     let image = image.resize(w, h, FilterType::Nearest);
 
     let config = Config {
-        sympols: (&opts.sym_set).into(),
+        sympols: (opts.sym_set).into(),
         bc: {
             if let Some(_) = &opts.background {
                 // TODO: parse the color like `lanterna`

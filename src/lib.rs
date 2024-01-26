@@ -3,153 +3,31 @@ pub mod color;
 #[cfg(feature = "image")]
 pub mod impl_image;
 pub mod sympols;
+#[cfg(feature = "text_image")]
+pub mod text_image;
 
 #[cfg(feature = "colors")]
 use color::ANSIColor;
+#[cfg(feature = "colors")]
 use color::{ANSI_BACKGROUND_ESCAPE, ANSI_ESCAPE_CLOSE, ANSI_FOREGROUND_ESCAPE};
 use sympols::Sympols;
 
-use std::{
-    error::Error,
-    fmt::{self, Display},
-    io::Write,
-    mem,
-};
+use std::{error::Error, io::Write, mem};
 
 /// Use colos.
 pub const COLORS: u8 = 0b1;
 /// Reverse the forgruond color with the background.
 pub const REVERSE: u8 = 0b10;
 
-/// Represent the ASCII art.
-#[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct BufferdWriter<'a> {
-    pub config: Config<'a>,
-    fragments: Vec<IndexdFragment>,
-    /// The columans number.
-    pub row_len: usize,
-    pub flags: u8,
-}
-
-impl BufferdWriter<'_> {
-    #[inline(always)]
-    pub fn len(&self) -> usize {
-        self.fragments.len()
-    }
-
-    #[inline(always)]
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    #[inline(always)]
-    pub fn reverse(&self) -> bool {
-        self.flags & REVERSE == REVERSE
-    }
-
-    #[inline(always)]
-    pub fn colors(&self) -> bool {
-        self.flags & COLORS == COLORS
-    }
-
-    #[inline(always)]
-    fn _background(&self, f: &mut fmt::Formatter<'_>) -> std::result::Result<bool, fmt::Error> {
-        if let Some(bc) = &self.config.bc {
-            write!(f, "{bc:-}")?;
-            return Ok(true);
-        }
-        Ok(false)
-    }
-
-    #[cfg(feature = "colors")]
-    #[inline]
-    fn _color_fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        use color::ANSI_ESCAPE_CLOSE;
-
-        let has_background = {
-            #[cfg(feature = "reverse")]
-            if self.reverse() {
-                let mut r = false;
-                if let Some(bc) = &self.config.bc {
-                    if !bc.is_transparent() {
-                        write!(f, "{bc}")?;
-                        r = true;
-                    }
-                }
-                r
-            } else {
-                self._background(f)?
-            }
-            #[cfg(not(feature = "reverse"))]
-            self._background(f)?
-        };
-
-        let mut i = 0;
-        for frag in &self.fragments {
-            if i == self.row_len {
-                i = 0;
-                writeln!(f)?;
-            }
-            i += 1;
-
-            #[cfg(feature = "reverse")]
-            if self.reverse() {
-                write!(f, "{c:-}", c = frag.fg)
-            } else {
-                write!(f, "{c}", c = frag.fg)
-            }?;
-            #[cfg(not(feature = "reverse"))]
-            write!(f, "{c}", c = frag.fg)?;
-
-            write!(
-                f,
-                "{ch}{ANSI_ESCAPE_CLOSE}",
-                ch = self.config.sympols.get(frag.ch_index as usize)
-            )?;
-        }
-
-        if has_background {
-            f.write_str(ANSI_ESCAPE_CLOSE)?;
-        }
-
-        Ok(())
-    }
-
-    #[inline(always)]
-    fn _fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut i = 0;
-        for frag in &self.fragments {
-            if i == self.row_len {
-                i = 0;
-                writeln!(f)?;
-            }
-            f.write_str(&self.config.sympols.get(frag.ch_index as usize).to_string())?;
-            i += 1;
-        }
-        Ok(())
-    }
-}
-
-impl Display for BufferdWriter<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        #[cfg(feature = "colors")]
-        {
-            if self.colors() {
-                self._color_fmt(f)
-            } else {
-                self._fmt(f)
-            }
-        }
-
-        #[cfg(not(feature = "colors"))]
-        self._fmt(f)
-    }
+pub trait PixelImage {
+    fn dimensions(&self) -> (u32, u32);
+    fn get_pixel(&self, x: u32, y: u32) -> Rgba;
 }
 
 pub trait FragmentWriter {
+    #[cfg(feature = "colors")]
     fn background(&mut self, bc: &ANSIColor) -> Result<bool, Box<dyn Error>>;
-    fn write_fragment(&mut self, fragment: Fragment) -> Result<(), Box<dyn Error>>;
+    fn write_fragment(&mut self, info: FragmentInfo) -> Result<(), Box<dyn Error>>;
     #[cfg(feature = "colors")]
     fn write_colored_fragment(
         &mut self,
@@ -174,8 +52,8 @@ impl<W: Write> FragmentWriter for W {
     }
 
     #[inline]
-    fn write_fragment(&mut self, fragment: Fragment) -> Result<(), Box<dyn Error>> {
-        self.write_all(fragment.ch.to_string().as_bytes())?;
+    fn write_fragment(&mut self, info: FragmentInfo) -> Result<(), Box<dyn Error>> {
+        self.write_all(info.sym.to_string().as_bytes())?;
         Ok(())
     }
 
@@ -208,15 +86,15 @@ impl<W: Write> FragmentWriter for W {
 
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct Config<'a> {
-    pub sympols: Sympols<'a>,
+pub struct Config {
+    pub sympols: Sympols,
     #[cfg(feature = "colors")]
     pub bc: Option<ANSIColor>,
     /// The columans number.
     pub flags: u8,
 }
 
-impl Config<'_> {
+impl Config {
     pub const fn reversed(&self) -> bool {
         self.flags & REVERSE == REVERSE
     }
@@ -236,28 +114,6 @@ impl Config<'_> {
                 * (3 * 3);
         }
         res
-    }
-}
-
-#[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct IndexdFragment {
-    ch_index: u8,
-    #[cfg(feature = "colors")]
-    fg: ANSIColor,
-}
-
-impl IndexdFragment {
-    #[cfg(not(feature = "colors"))]
-    #[inline(always)]
-    fn new(ch_index: u8) -> Self {
-        Self { ch_index }
-    }
-
-    #[cfg(feature = "colors")]
-    #[inline(always)]
-    fn new(ch_index: u8, fc: ANSIColor) -> Self {
-        Self { ch_index, fg: fc }
     }
 }
 
@@ -281,34 +137,27 @@ impl Fragment {
     }
 }
 
+#[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FragmentInfo {
-    sym: char,
-    sym_index: usize,
-}
-
-/// Trait to convert an imgae to ASCII art.
-pub trait ToTextImage {
-    fn to_text<'a>(&self, set: Sympols<'a>) -> BufferdWriter<'a>;
-}
-
-// impl<T> ToTextImage for T
-// where
-//     T: PixelImage,
-// {
-//     #[inline(always)]
-//     fn to_text<'a>(&self, set: Sympols<'a>) -> TextImage<'a> {
-//         crate::convert_image_to_ascii(self, set)
-//     }
-// }
-
-pub trait PixelImage {
-    fn dimensions(&self) -> (u32, u32);
+    pub sym: char,
+    pub sym_index: usize,
     #[cfg(feature = "colors")]
-    fn get_pixel(&self, x: u32, y: u32) -> Rgba;
+    pub fg: ANSIColor,
+}
+
+impl From<FragmentInfo> for Fragment {
+    fn from(v: FragmentInfo) -> Self {
+        Self {
+            ch: v.sym,
+            #[cfg(feature = "colors")]
+            fg: v.fg,
+        }
+    }
 }
 
 #[cfg(feature = "colors")]
-#[derive(Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Rgba {
     r: u8,
@@ -322,9 +171,6 @@ pub struct Rgba {
 /// **Note** You might want to resize the image before use this function if you want to fit the result
 /// on one page.
 ///
-/// #Arguments
-/// - image: The image to convert.
-/// - set: the ASCII sympols to draw the image with (from lighter to darker)
 pub fn convert_image_to_ascii<I, W>(
     config: &Config,
     image: &I,
@@ -335,8 +181,6 @@ where
     W: FragmentWriter,
 {
     let (width, height) = image.dimensions();
-    // let frag_cap = (width * height) as usize;
-    // let mut fragments = Vec::with_capacity(frag_cap);
     let ansi_close = if let Some(bc) = &config.bc {
         if !config.reversed() {
             out.background(bc)?
@@ -356,16 +200,26 @@ where
                 #[cfg(feature = "colors")]
                 {
                     let (sym, sym_index) = config.sympols.sym_and_index(&pixel);
-                    let fi = FragmentInfo { sym, sym_index };
-                    let mut fc = Some(ANSIColor::from(pixel));
+                    let fi = FragmentInfo {
+                        sym,
+                        sym_index,
+                        fg: ANSIColor::from(pixel),
+                    };
+                    let mut fg = Some(fi.fg.clone());
                     let mut bc = config.bc.clone();
                     if !ansi_close && config.reversed() {
-                        mem::swap(&mut bc, &mut fc);
+                        mem::swap(&mut bc, &mut fg);
                     }
-                    out.write_colored_fragment(fi, bc.as_ref(), fc.as_ref())?;
+                    out.write_colored_fragment(fi, bc.as_ref(), fg.as_ref())?;
                 }
             } else {
-                out.write_fragment(Fragment::new(config.sympols.sym(&pixel), pixel.into()))?;
+                let (sym, sym_index) = config.sympols.sym_and_index(&pixel);
+                out.write_fragment(FragmentInfo {
+                    sym,
+                    sym_index,
+                    #[cfg(feature = "colors")]
+                    fg: pixel.into(),
+                })?;
             }
         }
         out.write_bytes("\n".as_bytes())?;

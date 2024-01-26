@@ -38,8 +38,8 @@ image = { version = "0.24", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
 
 [features]
-default = ["colors", "reverse", "image"]
+default = ["colors", "reverse", "image", "text_image"]
 colors = []
 reverse = []
-serde = ["dep:serde", "_no_ref"]
-_no_ref = []
+serde = ["dep:serde"]
+text_image = []
