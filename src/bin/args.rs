@@ -1,6 +1,7 @@
-use std::env;
+use std::{env, num::NonZeroU8};
 
 use aarty::{COLORS, REVERSE};
+use image::imageops::FilterType;
 
 pub struct Opts {
     /// The image to convert to ASCII art
@@ -9,13 +10,14 @@ pub struct Opts {
     /// You can user one character if you uses the color mode
     pub sym_set: Vec<char>,
     /// The output scale (1 is the original size)
-    pub scale: u32,
+    pub scale: NonZeroU8,
     /// Enstablish how much wide is the output images, in columns. Overrides `scale`
     pub width: Option<u32>,
     pub height: Option<u32>,
     /// The background color to use
     pub background: Option<String>,
     pub flags: u8,
+    pub sf: FilterType,
 }
 
 impl Opts {
@@ -50,10 +52,14 @@ impl Opts {
                 opts.path = Some(arg);
                 continue;
             }
+            let arg = arg.to_lowercase();
             let arg = arg.trim_start_matches('-');
             match arg {
                 "c" | "sympols" | "chars" => opts.sym_set = value!(arg)?.chars().collect(),
-                "s" | "scale" => opts.scale = value!(parse; "scale", arg)?,
+                "s" | "scale" => {
+                    opts.scale = NonZeroU8::new(value!(parse; "scale", arg)?)
+                        .ok_or_else(|| "The scale should be greaer than 0,".to_string())?
+                }
                 "w" | "col" | "columans" | "width" => {
                     opts.width = Some(value!(parse; "width", arg)?)
                 }
@@ -63,6 +69,11 @@ impl Opts {
                 "b" | "back" | "background" => opts.background = Some(value!(arg)?),
                 "r" | "reverse" => opts.flags |= REVERSE,
                 "u" | "color" | "colors" => opts.flags |= COLORS,
+                "sft" | "st" => opts.sf = FilterType::Triangle,
+                "sfc" | "sc" => opts.sf = FilterType::CatmullRom,
+                "sfg" | "sg" => opts.sf = FilterType::Gaussian,
+                "sfl" | "sl" => opts.sf = FilterType::Lanczos3,
+                "sfn" | "sn" => opts.sf = FilterType::Nearest,
                 unknown => return Err(format!("Unknown opthion {unknown}")),
             }
         }
@@ -78,11 +89,12 @@ impl Default for Opts {
             sym_set: vec![
                 ' ', '.', ',', '-', '~', '!', ';', ':', '=', '*', '&', '%', '$', '@', '#',
             ],
-            scale: 4,
+            scale: unsafe { NonZeroU8::new_unchecked(4) },
             width: None,
             height: None,
             background: None,
             flags: 0,
+            sf: FilterType::Nearest,
         }
     }
 }
