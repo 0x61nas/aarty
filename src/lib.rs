@@ -5,12 +5,14 @@ pub mod impl_image;
 pub mod sympols;
 #[cfg(feature = "text_image")]
 pub mod text_image;
+#[cfg(feature = "text_image")]
+pub use text_image::{Fragment, IndexdFragment, TextImage, ToTextImage};
 
 #[cfg(feature = "colors")]
-use color::ANSIColor;
+pub use color::ANSIColor;
 #[cfg(feature = "colors")]
 use color::{ANSI_BACKGROUND_ESCAPE, ANSI_ESCAPE_CLOSE, ANSI_FOREGROUND_ESCAPE};
-use sympols::Sympols;
+pub use sympols::Sympols;
 
 use std::{error::Error, io::Write, mem};
 
