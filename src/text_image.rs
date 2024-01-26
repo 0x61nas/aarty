@@ -16,7 +16,7 @@ where
     T: PixelImage,
 {
     #[inline]
-    fn to_text<'a>(&self, cfg: Config) -> TextImage {
+    fn to_text(&self, cfg: Config) -> TextImage {
         let (w, h) = self.dimensions();
         let mut buf = TextImage::new(cfg.clone(), w, h);
         crate::convert_image_to_ascii(&cfg, self, &mut buf).expect("Unretchable");
