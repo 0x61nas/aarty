@@ -89,7 +89,7 @@ impl<W: Write> FragmentWriter for W {
 pub struct Config {
     pub sympols: Sympols,
     #[cfg(feature = "colors")]
-    pub bc: Option<ANSIColor>,
+    pub background: Option<ANSIColor>,
     /// The columans number.
     pub flags: u8,
 }
@@ -151,7 +151,7 @@ where
     W: FragmentWriter,
 {
     let (width, height) = image.dimensions();
-    let ansi_close = if let Some(bc) = &config.bc {
+    let ansi_close = if let Some(bc) = &config.background {
         if !config.reversed() {
             out.background(bc)?
         } else {
@@ -176,7 +176,7 @@ where
                         fg: ANSIColor::from(pixel),
                     };
                     let mut fg = Some(fi.fg.clone());
-                    let mut bc = config.bc.clone();
+                    let mut bc = config.background.clone();
                     if !ansi_close && config.reversed() {
                         mem::swap(&mut bc, &mut fg);
                     }

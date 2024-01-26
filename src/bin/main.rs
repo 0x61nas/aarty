@@ -73,7 +73,7 @@ fn main() {
 
     let config = Config {
         sympols: (opts.sym_set).into(),
-        bc: {
+        background: {
             if let Some(_) = &opts.background {
                 // TODO: parse the color like `lanterna`
                 Some((255, 208, 187).into())

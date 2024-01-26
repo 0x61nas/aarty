@@ -180,7 +180,7 @@ impl TextImage {
 
     #[inline(always)]
     fn _background(&self, f: &mut fmt::Formatter<'_>) -> std::result::Result<bool, fmt::Error> {
-        if let Some(bc) = &self.config.bc {
+        if let Some(bc) = &self.config.background {
             write!(f, "{bc:-}")?;
             return Ok(true);
         }
@@ -194,7 +194,7 @@ impl TextImage {
             #[cfg(feature = "reverse")]
             if self.config.reversed() {
                 let mut r = false;
-                if let Some(bc) = &self.config.bc {
+                if let Some(bc) = &self.config.background {
                     if !bc.is_transparent() {
                         write!(f, "{bc}")?;
                         r = true;
