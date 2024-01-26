@@ -1,5 +1,7 @@
 use crate::Rgba;
 
+pub const EMPTY_SET: Sympols = Sympols::new(vec![]);
+
 const EMPTY_CHAR: char = ' ';
 
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
@@ -12,6 +14,11 @@ impl Sympols {
     pub const fn new(set: Vec<char>) -> Sympols {
         Sympols { set }
     }
+
+    pub const fn empty() -> Self {
+        EMPTY_SET
+    }
+
     #[inline(always)]
     pub fn get(&self, i: usize) -> char {
         if self.is_empty() {
