@@ -32,7 +32,6 @@ pub struct TextImage {
     fragments: Vec<IndexdFragment>,
     /// The columans number.
     pub row_len: usize,
-    pub flags: u8,
 }
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -59,7 +58,6 @@ impl TextImage {
             config: cfg,
             fragments: Vec::with_capacity(w as usize * h as usize),
             row_len: w as usize,
-            flags: 0,
         }
     }
     #[inline(always)]
