@@ -36,16 +36,85 @@ pub struct TextImage {
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct IndexdFragment {
-    ch_index: u8,
+    pub sym_index: u8,
     #[cfg(feature = "colors")]
-    fg: ANSIColor,
+    pub fg: ANSIColor,
+}
+
+impl IndexdFragment {
+    #[inline(always)]
+    pub const fn new(sym_index: u8) -> Self {
+        #[cfg(not(feature = "colors"))]
+        return Self { sym_index };
+
+        #[cfg(feature = "colors")]
+        Self {
+            sym_index,
+            fg: crate::color::TRANSBARENT,
+        }
+    }
+
+    #[cfg(feature = "colors")]
+    #[inline(always)]
+    pub const fn new_with_color(sym_index: u8, fg: ANSIColor) -> Self {
+        Self { sym_index, fg }
+    }
 }
 
 impl From<FragmentInfo> for IndexdFragment {
     #[inline]
     fn from(v: FragmentInfo) -> Self {
         Self {
-            ch_index: v.sym_index as u8,
+            sym_index: v.sym_index as u8,
+            #[cfg(feature = "colors")]
+            fg: v.fg,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Fragment {
+    ch: char,
+    #[cfg(feature = "colors")]
+    fg: ANSIColor,
+}
+
+impl Fragment {
+    #[inline(always)]
+    pub const fn new(ch: char) -> Self {
+        #[cfg(not(feature = "colors"))]
+        return Self { ch };
+
+        #[cfg(feature = "colors")]
+        Self {
+            ch,
+            fg: crate::color::TRANSBARENT,
+        }
+    }
+
+    #[cfg(feature = "colors")]
+    #[inline(always)]
+    pub const fn new_with_color(ch: char, fg: ANSIColor) -> Self {
+        Self { ch, fg }
+    }
+
+    #[inline(always)]
+    pub const fn sym(&self) -> char {
+        self.ch
+    }
+
+    #[cfg(feature = "colors")]
+    #[inline(always)]
+    pub const fn foreground(&self) -> &ANSIColor {
+        &self.fg
+    }
+}
+
+impl From<FragmentInfo> for Fragment {
+    fn from(v: FragmentInfo) -> Self {
+        Self {
+            ch: v.sym,
             #[cfg(feature = "colors")]
             fg: v.fg,
         }
@@ -60,6 +129,45 @@ impl TextImage {
             row_len: w as usize,
         }
     }
+
+    pub fn fragment_at(&self, x: u32, y: u32) -> Option<Fragment> {
+        self.get(x as usize * self.row_len + y as usize)
+    }
+
+    pub fn get(&self, idx: usize) -> Option<Fragment> {
+        if idx < self.len() {
+            return Some(unsafe { self.get_unchecked(idx) });
+        }
+        None
+    }
+
+    /// # Safety
+    /// The caller must check from that the index is in the range.
+    pub unsafe fn get_unchecked(&self, idx: usize) -> Fragment {
+        let fragment = self.fragments.get_unchecked(idx);
+        Fragment {
+            ch: self.config.sympols.get(fragment.sym_index as usize),
+            #[cfg(feature = "colors")]
+            fg: fragment.fg.clone(),
+        }
+    }
+
+    /// # Safety
+    /// The caller must check from the courdents that its in the range.
+    pub unsafe fn fragment_at_unchecked(&self, x: u32, y: u32) -> Fragment {
+        self.get_unchecked(x as usize * self.row_len + y as usize)
+    }
+
+    #[inline]
+    pub fn insert(&mut self, idx: usize, fragment: IndexdFragment) {
+        self.fragments.insert(idx, fragment);
+    }
+
+    #[inline]
+    pub fn put(&mut self, x: u32, y: u32, fragment: IndexdFragment) {
+        self.insert(x as usize * self.row_len + y as usize, fragment);
+    }
+
     #[inline(always)]
     pub fn len(&self) -> usize {
         self.fragments.len()
@@ -120,7 +228,7 @@ impl TextImage {
             write!(
                 f,
                 "{ch}{ANSI_ESCAPE_CLOSE}",
-                ch = self.config.sympols.get(frag.ch_index as usize)
+                ch = self.config.sympols.get(frag.sym_index as usize)
             )?;
         }
 
@@ -139,7 +247,7 @@ impl TextImage {
                 i = 0;
                 writeln!(f)?;
             }
-            f.write_str(&self.config.sympols.get(frag.ch_index as usize).to_string())?;
+            f.write_str(&self.config.sympols.get(frag.sym_index as usize).to_string())?;
             i += 1;
         }
         Ok(())
