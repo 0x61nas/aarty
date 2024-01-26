@@ -117,26 +117,6 @@ impl Config {
     }
 }
 
-pub struct Fragment {
-    ch: char,
-    #[cfg(feature = "colors")]
-    fg: ANSIColor,
-}
-
-impl Fragment {
-    #[cfg(not(feature = "colors"))]
-    #[inline(always)]
-    fn new(ch: char) -> Self {
-        Self { ch }
-    }
-
-    #[cfg(feature = "colors")]
-    #[inline(always)]
-    fn new(ch: char, fc: ANSIColor) -> Self {
-        Self { ch, fg: fc }
-    }
-}
-
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FragmentInfo {
@@ -144,16 +124,6 @@ pub struct FragmentInfo {
     pub sym_index: usize,
     #[cfg(feature = "colors")]
     pub fg: ANSIColor,
-}
-
-impl From<FragmentInfo> for Fragment {
-    fn from(v: FragmentInfo) -> Self {
-        Self {
-            ch: v.sym,
-            #[cfg(feature = "colors")]
-            fg: v.fg,
-        }
-    }
 }
 
 #[cfg(feature = "colors")]

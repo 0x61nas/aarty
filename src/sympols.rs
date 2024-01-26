@@ -56,11 +56,6 @@ impl Sympols {
     }
 
     #[inline]
-    pub(crate) fn sym(&self, pixel: &Rgba) -> char {
-        self.get(self.sym_index(pixel))
-    }
-
-    #[inline]
     pub(crate) fn sym_and_index(&self, pixel: &Rgba) -> (char, usize) {
         let idx = self.sym_index(pixel);
         (self.get(idx), idx)
