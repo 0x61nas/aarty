@@ -81,7 +81,7 @@ impl From<FragmentInfo> for IndexdFragment {
     }
 }
 
-/// Represent pixelin tty contixt.
+/// Represent pixel in tty context.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Fragment {
