@@ -3,8 +3,8 @@ name = "aarty"
 version = "0.4.9"
 edition = "2021"
 authors = ["Anas Elgarhy <anas.elgarhy.dev@gmail.com>"]
-description = "A simple CLI tool to convert the images to ASCII art"
-repository = "https://github.com/anas-elgarhy/aarty"
+description = "Mini-framework to display pictures on your terminal"
+repository = "https://github.com/0x61nas/aarty"
 license = "MIT"
 readme = "README.md"
 autobins = false
@@ -12,7 +12,7 @@ keywords = [
     "ascii",
     "art",
     "image",
-    "cli"
+    "pictures"
 ]
 categories = [
     "command-line-utilities",
@@ -26,7 +26,6 @@ include = [
     "LICENSE",
     "CHANGELOG.md"
 ]
-exclude = ["images/*"]
 
 
 [[bin]]
