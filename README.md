@@ -1,6 +1,4 @@
-<p align="center">
-    <img alt="Showcase" src="./assests/showcase.png" width="250">
-</p>
+[![asciicast](https://asciinema.org/a/633827.svg)](https://asciinema.org/a/633827)
 
 ## **aarty**
 mini freamwork to render images in the terminals/ttys.
