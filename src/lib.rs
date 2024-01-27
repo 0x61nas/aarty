@@ -1,4 +1,5 @@
-//! **aarty**: mini freamwork to render images in the terminals/ttys.
+//! # **aarty**
+//! mini freamwork to render images in the terminals/ttys.
 //!
 //! [![crates.io](https://img.shields.io/crates/v/aarty.svg)](https://crates.io/crates/aarty)
 //! [![docs.rs](https://docs.rs/aarty/badge.svg)](https://docs.rs/aarty)
