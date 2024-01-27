@@ -132,10 +132,10 @@
 /// ANSI color.
 #[cfg(feature = "colors")]
 pub mod color;
-/// The traits implimaantions for the [`image`] crate cmpataplty.
+/// The traits implimaantions for the [`image`] crate intigration.
 #[cfg(feature = "image")]
 pub mod impl_image;
-/// The [`Spmpols`] struct.
+/// The [`Sympols`] struct.
 pub mod sympols;
 /// The [`ToTextImage`] and [`TextImage`] stuff.
 #[cfg(feature = "text_image")]
@@ -160,11 +160,11 @@ pub const REVERSE: u8 = 0b10;
 pub trait PixelImage {
     /// Get the image dimensions (the width, and height).
     fn dimensions(&self) -> (u32, u32);
-    /// Get the RGBA value of a specific coordinates.
+    /// Get the RGBA value of a specific pixel.
     fn get_pixel(&self, x: u32, y: u32) -> Rgba;
 }
 
-/// A trait for objects which are
+/// A trait for objects that can used as a buffer (out) with [`convert_image_to_ascci`]
 pub trait FragmentWriter {
     /// Rseves the background of the image and return a boolean that iindcates if they which from the cally to call [`FragmentWriter::write_bytes`] and send the `ANSI CLOSE` escape code or no.
     #[cfg(feature = "colors")]
