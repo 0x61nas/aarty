@@ -164,7 +164,7 @@ pub trait PixelImage {
     fn get_pixel(&self, x: u32, y: u32) -> Rgba;
 }
 
-/// A trait for objects that can used as a buffer (out) with [`convert_image_to_ascci`]
+/// A trait for objects that can used as a buffer (out) with [`convert_image_to_ascii`]
 pub trait FragmentWriter {
     /// Rseves the background of the image and return a boolean that iindcates if they which from the cally to call [`FragmentWriter::write_bytes`] and send the `ANSI CLOSE` escape code or no.
     #[cfg(feature = "colors")]
@@ -271,14 +271,14 @@ impl Config {
     }
 }
 
-/// the fragment (a.k.a. pixel) information6
+/// the fragment (a.k.a. pixel) information.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FragmentInfo {
     /// the character that had chosen from the sympols set to represent this pixel.
     pub sym: char,
     /// The sympol index in the sympols set (might be useful if you want to store this info in memory
-    /// and happen that you know that the symplos set size arn't gonna more then [`u8::MIX`])
+    /// and happen that you know that the symplos set size arn't gonna more then [`u8::MAX`])
     pub sym_index: usize,
     /// The pixel color in ANSI representation.
     #[cfg(feature = "colors")]
