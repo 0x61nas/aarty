@@ -129,22 +129,26 @@
 //! [mit]: https://github.com/0x61nas/aarty/blob/aurora/LICENSE
 //!
 
+/// ANSI color.
 #[cfg(feature = "colors")]
 pub mod color;
+/// The traits implimaantions for the [`image`] crate cmpataplty.
 #[cfg(feature = "image")]
 pub mod impl_image;
+/// The [`Spmpols`] struct.
 pub mod sympols;
+/// The [`ToTextImage`] and [`TextImage`] stuff.
 #[cfg(feature = "text_image")]
 pub mod text_image;
+// Re-exports
+#[cfg(feature = "colors")]
+pub use color::ANSIColor;
+pub use sympols::Sympols;
 #[cfg(feature = "text_image")]
 pub use text_image::{Fragment, IndexdFragment, TextImage, ToTextImage};
 
 #[cfg(feature = "colors")]
-pub use color::ANSIColor;
-#[cfg(feature = "colors")]
 use color::{ANSI_BACKGROUND_ESCAPE, ANSI_ESCAPE_CLOSE, ANSI_FOREGROUND_ESCAPE};
-pub use sympols::Sympols;
-
 use std::{error::Error, io::Write, mem};
 
 /// Use colors flag.
