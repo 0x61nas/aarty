@@ -152,15 +152,24 @@ pub const COLORS: u8 = 0b1;
 /// Reverse the forgruond color with the background.
 pub const REVERSE: u8 = 0b10;
 
+/// Trait that represent the (normal) images, that we wanna transform them.
 pub trait PixelImage {
+    /// Get the image dimensions (the width, and height).
     fn dimensions(&self) -> (u32, u32);
+    /// Get the RGBA value of a specific coordinates.
     fn get_pixel(&self, x: u32, y: u32) -> Rgba;
 }
 
+/// A trait for objects which are
 pub trait FragmentWriter {
+    /// Rseves the background of the image and return a boolean that iindcates if they which from the cally to call [`FragmentWriter::write_bytes`] and send the `ANSI CLOSE` escape code or no.
     #[cfg(feature = "colors")]
     fn background(&mut self, bc: &ANSIColor) -> Result<bool, Box<dyn Error>>;
+
+    /// Write a fragment to te buffer.
     fn write_fragment(&mut self, info: FragmentInfo) -> Result<(), Box<dyn Error>>;
+
+    /// Write a fragment that may have a different background/foreground.
     #[cfg(feature = "colors")]
     fn write_colored_fragment(
         &mut self,
@@ -168,6 +177,8 @@ pub trait FragmentWriter {
         bc: Option<&ANSIColor>,
         fc: Option<&ANSIColor>,
     ) -> Result<(), Box<dyn Error>>;
+
+    /// Write raw bytes to the buffer, tipclly used for the `ANSI CcLOSE` escapecode when the image is  finished, or to write `\n` after each row.
     fn write_bytes(&mut self, bytes: &[u8]) -> Result<(), Box<dyn Error>>;
 }
 
@@ -217,25 +228,31 @@ impl<W: Write> FragmentWriter for W {
     }
 }
 
+/// the main config structure
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Config {
+    /// The sympols (characters) set.
     pub sympols: Sympols,
+    /// The result image background, useful if the image has a transparent parts or if you plan to use the [`REVERSE`] flag.
     #[cfg(feature = "colors")]
     pub background: Option<ANSIColor>,
-    /// The columans number.
+    /// the boolean flags.
     pub flags: u8,
 }
 
 impl Config {
+    /// return true if the [`REVERSE`] flag is set.
     pub const fn reversed(&self) -> bool {
         self.flags & REVERSE == REVERSE
     }
 
+    /// return true if the [`COLORS`] flag is set.
     pub const fn use_colors(&self) -> bool {
         self.flags & COLORS == COLORS
     }
 
+    /// Calculate how much space the raw representation would use (the worst case).
     pub const fn calc_buf_size(&self, w: u32, h: u32) -> usize {
         let mut res = w as usize * h as usize;
         if self.use_colors() {
@@ -250,26 +267,35 @@ impl Config {
     }
 }
 
+/// the fragment (a.k.a. pixel) information6
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FragmentInfo {
+    /// the character that had chosen from the sympols set to represent this pixel.
     pub sym: char,
+    /// The sympol index in the sympols set (might be useful if you want to store this info in memory
+    /// and happen that you know that the symplos set size arn't gonna more then [`u8::MIX`])
     pub sym_index: usize,
+    /// The pixel color in ANSI representation.
     #[cfg(feature = "colors")]
     pub fg: ANSIColor,
 }
 
-#[cfg(feature = "colors")]
+/// RGBA pixel.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Rgba {
+    /// Red.
     r: u8,
+    /// Green.
     g: u8,
+    /// Blue.
     b: u8,
+    /// Alpha.
     a: u8,
 }
 
-/// Convert the image into ASCII art.
+/// Convert the image into ASCII art based on the [`Config`] and write it to the [`FragmentWriter`].
 ///
 /// **Note** You might want to resize the image before use this function if you want to fit the result
 /// on one page.
