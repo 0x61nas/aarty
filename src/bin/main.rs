@@ -8,7 +8,7 @@ use std::{
 };
 
 use aarty::{convert_image_to_ascii, Config};
-use image::{imageops::FilterType, io::Reader, GenericImageView};
+use image::{io::Reader, GenericImageView};
 
 use crate::args::Opts;
 
