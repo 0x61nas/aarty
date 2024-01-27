@@ -8,6 +8,7 @@ use crate::color::{ANSIColor, ANSI_ESCAPE_CLOSE};
 
 /// Trait to convert an imgae to ASCII art.
 pub trait ToTextImage {
+    /// consturcts a [`TextImage`] instance and use it with [`crate::convert_image_to_ascii`] and return it.
     fn to_text(&self, cfg: Config) -> TextImage;
 }
 
@@ -28,20 +29,27 @@ where
 #[derive(Debug, PartialEq, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TextImage {
+    /// The config.
     pub config: Config,
     fragments: Vec<IndexdFragment>,
     /// The columans number.
     pub row_len: usize,
 }
+
+/// Represent the fragment by the sympol index in the sympols set.
+/// it can be useful by reduce the size that required to store a [`crate::Fragment`] by 3 bytes less.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct IndexdFragment {
+    /// The sympol index in the provided sympols set.
     pub sym_index: u8,
+    /// The symplol foregruond color.
     #[cfg(feature = "colors")]
     pub fg: ANSIColor,
 }
 
 impl IndexdFragment {
+    /// Construct a new instance.
     #[inline(always)]
     pub const fn new(sym_index: u8) -> Self {
         #[cfg(not(feature = "colors"))]
@@ -54,6 +62,7 @@ impl IndexdFragment {
         }
     }
 
+    /// Construct a new instance with foreground color.
     #[cfg(feature = "colors")]
     #[inline(always)]
     pub const fn new_with_color(sym_index: u8, fg: ANSIColor) -> Self {
@@ -72,6 +81,7 @@ impl From<FragmentInfo> for IndexdFragment {
     }
 }
 
+/// Represent pixelin tty contixt.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Fragment {
@@ -81,6 +91,7 @@ pub struct Fragment {
 }
 
 impl Fragment {
+    /// Construct a new instance.
     #[inline(always)]
     pub const fn new(ch: char) -> Self {
         #[cfg(not(feature = "colors"))]
@@ -93,17 +104,20 @@ impl Fragment {
         }
     }
 
+    /// Construct a new instance with foreground color.
     #[cfg(feature = "colors")]
     #[inline(always)]
     pub const fn new_with_color(ch: char, fg: ANSIColor) -> Self {
         Self { ch, fg }
     }
 
+    /// Get the character.
     #[inline(always)]
     pub const fn sym(&self) -> char {
         self.ch
     }
 
+    /// Get the fragment foreground.
     #[cfg(feature = "colors")]
     #[inline(always)]
     pub const fn foreground(&self) -> &ANSIColor {
@@ -122,6 +136,7 @@ impl From<FragmentInfo> for Fragment {
 }
 
 impl TextImage {
+    /// Construct a new instance.
     pub fn new(cfg: Config, w: u32, h: u32) -> Self {
         Self {
             config: cfg,
@@ -130,10 +145,20 @@ impl TextImage {
         }
     }
 
+    /// Get the fragment at a specific courdents.
+    ///
+    /// this may return [`None`] if the specifiyed courdenates is out of range.
+    ///
+    /// See: [`TextImage::fragment_at_unchecked`]
     pub fn fragment_at(&self, x: u32, y: u32) -> Option<Fragment> {
         self.get(x as usize * self.row_len + y as usize)
     }
 
+    /// Get the fragment at a specific index.
+    ///
+    /// this may return [`None`] if the specifiyed index is out of range.
+    ///
+    /// See: [`TextImage::get_unchecked`]
     pub fn get(&self, idx: usize) -> Option<Fragment> {
         if idx < self.len() {
             return Some(unsafe { self.get_unchecked(idx) });
@@ -141,6 +166,8 @@ impl TextImage {
         None
     }
 
+    /// Get the fragment at a specific index without the i range checking overhead
+    ///
     /// # Safety
     /// The caller must check from that the index is in the range.
     pub unsafe fn get_unchecked(&self, idx: usize) -> Fragment {
@@ -152,27 +179,33 @@ impl TextImage {
         }
     }
 
+    /// Get the fragment at a specific courdenates without the i range checking overhead
+    ///
     /// # Safety
     /// The caller must check from the courdents that its in the range.
     pub unsafe fn fragment_at_unchecked(&self, x: u32, y: u32) -> Fragment {
         self.get_unchecked(x as usize * self.row_len + y as usize)
     }
 
+    /// Insert a new fragment at index.
     #[inline]
     pub fn insert(&mut self, idx: usize, fragment: IndexdFragment) {
         self.fragments.insert(idx, fragment);
     }
 
+    /// Insert a new fragment at courdetates.
     #[inline]
     pub fn put(&mut self, x: u32, y: u32, fragment: IndexdFragment) {
         self.insert(x as usize * self.row_len + y as usize, fragment);
     }
 
+    /// The fragments inner array len.
     #[inline(always)]
     pub fn len(&self) -> usize {
         self.fragments.len()
     }
 
+    /// Return true if the inner fragment array is empty.
     #[inline(always)]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
