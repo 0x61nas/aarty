@@ -8,7 +8,7 @@ use crate::color::{ANSIColor, ANSI_ESCAPE_CLOSE};
 
 /// Trait to convert an imgae to ASCII art.
 pub trait ToTextImage {
-    /// consturcts a [`TextImage`] instance and use it with [`crate::convert_image_to_ascii`] and return it.
+    /// constructs a [`TextImage`] instance and use it with [`crate::convert_image_to_ascii`] and return it.
     fn to_text(&self, cfg: Config) -> TextImage;
 }
 

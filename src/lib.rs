@@ -171,7 +171,7 @@ pub trait FragmentWriter {
     #[cfg(feature = "colors")]
     fn background(&mut self, bc: &ANSIColor) -> Result<bool, Box<dyn Error>>;
 
-    /// Write a fragment to te buffer.
+    /// Write a fragment to the buffer.
     fn write_fragment(&mut self, info: FragmentInfo) -> Result<(), Box<dyn Error>>;
 
     /// Write a fragment that may have a different background/foreground.
@@ -279,7 +279,7 @@ pub struct FragmentInfo {
     /// the character that had chosen from the sympols set to represent this pixel.
     pub sym: char,
     /// The sympol index in the sympols set (might be useful if you want to store this info in memory
-    /// and happen that you know that the symplos set size arn't gonna more then [`u8::MAX`])
+    /// and happen that you know that the symplos set size aren't gonna more then [`u8::MAX`])
     pub sym_index: usize,
     /// The pixel color in ANSI representation.
     #[cfg(feature = "colors")]
