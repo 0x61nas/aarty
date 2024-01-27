@@ -10,6 +10,7 @@ pub(crate) const TRANSBARENT: ANSIColor = ANSIColor {
     inner: String::new(),
 };
 
+/// ansi color.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ANSIColor {
@@ -17,6 +18,7 @@ pub struct ANSIColor {
 }
 
 impl ANSIColor {
+    /// Construct a new instance.
     pub fn new(r: u8, g: u8, b: u8) -> ANSIColor {
         let mut c = String::with_capacity(ANSI_COLOR_CODE_LEN);
 
@@ -31,14 +33,18 @@ impl ANSIColor {
         ANSIColor { inner: c }
     }
 
+    /// return true if the color is transparent.
     #[inline(always)]
     pub fn is_transparent(&self) -> bool {
         self.inner.is_empty()
     }
 
+    /// Return an ANSI escaped background color.
     pub fn as_background(&self) -> String {
         format!("{ANSI_BACKGROUND_ESCAPE}{}m", self.inner)
     }
+
+    /// Return an ANSI escaped foreground color.
     pub fn as_foreground(&self) -> String {
         format!("{ANSI_FOREGROUND_ESCAPE}{}m", self.inner)
     }
