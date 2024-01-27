@@ -87,7 +87,7 @@
 //! let image = image::open("mylove.jpg").unwrap();
 //! let (w, h) = image.dimensions();
 //! let mut frame = TerminalFrame {
-//!     fragments: Vec::with_capacity(w * h),
+//!     fragments: Vec::with_capacity(w as usize * h as usize),
 //!     cfg: cfg.clone(),
 //! };
 //! aarty::convert_image_to_ascii(&cfg, &image, &mut frame).expect("Write error");
