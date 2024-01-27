@@ -1,196 +1,98 @@
-# aarty: A simple CLI tool to convert images to ASCII art with Rust 🦀
+<p align="center">
+    <img alt="Showcase" src="./assests/showcase.png" width="250">
+</p>
 
-![srceenshots/anime_2_colored_scale_4.gif](./srceenshots/anime_2_colored_scale_4.gif)
-![money mouth face colored scale 2](./srceenshots/money_mouth_face_colored_scale_2.png)
-![money mouth face normal scale 2](./srceenshots/money_mouth_face_normal_scale_2.png)
+## **aarty**
+mini freamwork to render images in the terminals/ttys.
 
-<details>
-<summary>More screenshots</summary>
-
-![crab colored scale 1](./srceenshots/crap_colored_scale_1.png)
-[Original image](./images/crab.png)
-![crap colored scale](./srceenshots/crap_colored_scale_2.png)
-[Original image](./images/crab.png)
-![nerd face colored scale](./srceenshots/nerd_face_colored_scale_2.png)
-[Original image](./images/nerd_face.png)
-![nerd face normal scale](./srceenshots/nerd_face_normal_scale_2.png)
-[Original image](./images/nerd_face.png)
-![srceenshots/anime_2_colored_scale_4.gif](./srceenshots/anime_2_colored_scale_4.gif)
-[Original image](./images/anime_2.jpg)
-![anime colored scale 3](./srceenshots/anime_colored_scale_3.gif)
-[Original image](./images/anime.jpg)
-
-</details>
-
-```
-           ~~~~~~~!!!!~!!~                ~!!!!!!!!!~~~~~           
-         ~~~~!!!!!!!!!!!!!!!!           !!!!!!!!!!!!!!!!~~~~        
-       ~~~~~!!!!!!!!!!!!!!!!!!~       !!!!!!!!!!!!!!!!!!!!~~~~      
-      ~~~~~~!!!!!!!!!!!!!!!!!!!~    ~!!!!!!!!!!!!!!!!!!!!!!~~~~     
-     ~~~~~~~!!!!!!!!!!!!!!!!!!!!!  !!!!!!!!!!!!!!!!!!!!!!!!~~~~~    
-    ~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!~!!!!!!!!!!!!!!!!!!!!!!!!~~~~~    
-    ~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~~~~~    
-    ~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~~~~~    
-    ~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~~~~~~    
-    ~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~~~~~~    
-     ~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~~~~~~~    
-     ~~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~~~~~~~     
-      ~~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~~~~~~~      
-       ~~~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~~~~~~~~       
-        ~~~~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!~~~~~~~~~        
-          ~~~~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!~~~~~~~~~~~         
-           ~~~~~~~~~~~~~~~!!!!!!!!!!!!!!!!!!!~~~~~~~~~~~~           
-             ~~~~~~~~~~~~~~~~~~~~~!!!~~~~~~~~~~~~~~~~~~~            
-              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~              
-                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                
-                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                  
-                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~                    
-                      ~~~~~~~~~~~~~~~~~~~~~~~~                      
-                         ~~~~~~~~~~~~~~~~~~~                        
-                           ~~~~~~~~~~~~~~~                          
-                             ~~~~~~~~~~                             
-                                ~~~~~                
-```
-
-## Install
-
-- from crates.io
-    ```bash
-    cargo install aarty
-    ```
-- From aur: 
-  ```shell 
-  yay -S aarty
-  ```
-
-## Options and arguments
-
-
-```bash
-aarty --help
-```
-```
-A simple CLI tool to convert the images to ASCII art
-
-Usage: aarty [OPTIONS] <IMAGE>
-
-Arguments:
-  <IMAGE>
-          The image to convert to ASCII art
-
-Options:
-  -m, --mode <MODE>
-          The art mode to use
-          
-          [default: normal-ascii]
-
-          Possible values:
-          - normal-ascii: Normal ASCII art
-          - colored:      Colored ASCII art, the colors are based on the terminal colors
-
-      --output-method <OUTPUT_METHOD>
-          [default: stdout]
-
-          Possible values:
-          - file:   Save the ascii art to a file
-          - stdout: Print the ascii art to the terminal
-
-  -c, --characters <CHARACTERS>
-          The character to use for drawing the image (lighter to darker) You can user one character if you uses the color mode
-          
-          [default: " .,-~!;:=*&%$@#"]
-
-  -s, --scale <SCALE>
-          The output scale (1 is the original size)
-          
-          [default: 4]
-
-  -w, --width <WIDTH>
-          Enstablish how much wide is the output images, in columns. Overrides `scale`
-
-  -b, --background <BACKGROUND>
-          The background color to use
-
-  -o, --output <OUTPUT>
-          The output file to write to (if output_method is file)
-          
-          [default: ascii_image.txt]
-
-  -h, --help
-          Print help information (use `-h` for a summary)
-
-  -V, --version
-          Print version information
-```
+[![crates.io](https://img.shields.io/crates/v/aarty.svg)](https://crates.io/crates/aarty)
+[![docs.rs](https://docs.rs/aarty/badge.svg)](https://docs.rs/aarty)
+[![downloads](https://img.shields.io/crates/d/aarty.svg)](https://crates.io/crates/aarty)
+[![license](https://img.shields.io/crates/l/aarty.svg)](https://github.com/0x61nas/aarty/blob/aurora/LICENSE)
 
 ## Examples
+```rust
+let cfg = Config {
+    sympols: vec![' ', '.', ',', '-', '~', '!', '*', '%', '$', '@', '#'].into(),
+    background: None,
+    flags: 0,
+};
+let image = image::open("mylove.jpg").unwrap();
+let (w, h) = image.dimensions();
 
-```shell
-aarty -m images/airplane.png
-```
-```
-                         :=:**    
-                        =***:*    
-   ~~!!!~~~~~~~ ~~~   =*****=     
-         ~~~!!!!!!!!=*****=       
-                 ~:*****=         
-                :===**:!~         
-              ;======~!!~~        
-            ;:===::   ~!~         
-          ;:;~:::     ~!!~~       
-     ~~!!;~~:;         !!~        
-        ~~!!~          ~!~        
-          ~!~           !~        
-           ~~           ~~        
-```
+let mut out = BufWriter::with_capacity(cfg.calc_buf_size(w, h), io::stdout().lock());
 
-```shell
-aarty -m colored images/airplane.png
+convert_image_to_ascii(&cfg, &image, &mut out).expect("IO error");
 ```
-![airplane colored scale 4](./srceenshots/airplane_colored_scale_4.png)
-
-```shell
-aarty -m colored images/airplane.png -s 2
+Enable the foreground colors
+```rust
+let cfg = Config {
+    sympols: vec![' ', '.', ',', '-', '~', '!', '*', '%', '$', '@', '#'].into(),
+    background: None,
+    flags: COLORS,
+};
+// ...
 ```
-![airplane colored scale 2](./srceenshots/airplane_colored_scale_2.png)
-
-```shell
-aarty -c " ~okOK#\$%" images/ok_hand.png
+Reverse them with the background color
+```rust
+let cfg = Config {
+    sympols: Sympols::empty(),
+    background: Some((232, 209, 204).into()),
+    flags: COLORS | REVERSE,
+};
+// ...
 ```
-```
-                                        
-                     $$$#               
-                     #$$$$#             
-                  K#KO#$$$$#            
-                  k###O#$$$$#           
-                    kK#OK$$$$#K         
-                      OKKO#$$$#         
-              O#$$#O    KKK$$$$#        
-         K$$$$$$$$$$$$$#OOk#$$$#K       
-         K$$$$$$$$$$$$$$$$##K#$$#K      
-       #$K OO     OK#$$$$$$$$$$###      
-      #$$$$#         OO##$$$$$$$$$#     
-      O#$$$$#          #$$$$$$$$$$KO    
-       K#$$$$#       K#$$$$$$$$$$KO     
-       O#$$$$$$#KK####$$$$$$$$$##K      
-         K#$$$$$$$$$$$$$$$$$$$$#KO      
-          K##$$$$$$$$$$$$$$$$$##O       
-           kK###$$$$$$$$$$$$###K        
-             OK######$$######KO         
-                OOKKKKKKKKOO            
-```
+If you wanna build a rebresentesion in memory so you can modify it or use it multiple times, then you may found that implement [`FragmentWriter`]
+for such a structher is useful.
+```rust
+struct TerminalFrame {
+    fragments: Vec<(char, ANSIColor)>,
+   cfg: Config,
+}
 
-```shell
-aarty -c " ~okOK#\$%" images/ok_hand.png -m colored
-```
-![ok hand colored scale 4 custome chars](./srceenshots/ok_hand_colored_scale_4_custome_chars.png)
+impl FragmentWriter for TerminalFrame {
+    fn background(&mut self, _: &ANSIColor) -> Result<bool, Box<dyn std::error::Error>> {
+        // Nah, I don't care, I have my configs :p
+        //  but pretent like if you care so it will skip the swap operation.
+        Ok(true)
+    }
 
-```shell
-aarty -c " ~okOK#\$%" images/ok_hand.png -m colored --output-method file -o ok_ascii.txt
-```
-![ok hand colored scale 4 custome chars in file](./srceenshots/ok_hand_colored_scale_4_custome_chars_in_file.png)
+    fn write_fragment(&mut self, info: FragmentInfo) -> Result<(), Box<dyn std::error::Error>> {
+        self.fragments.push((info.sym, info.fg));
+        Ok(())
+    }
 
-> If you get here, don't forget the star yooo ⭐
+    fn write_colored_fragment(
+        &mut self,
+        info: FragmentInfo,
+        _: Option<&ANSIColor>,
+        _: Option<&ANSIColor>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        self.write_fragment(info)
+    }
 
+    fn write_bytes(&mut self, _bytes: &[u8]) -> Result<(), Box<dyn std::error::Error>> {
+        // Just ignore them
+        Ok(())
+    }
+}
 
-[![License MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://spdx.org/licenses/MIT.html)
+// So you can use it as a buffer
+let cfg = Config {
+    sympols: vec!['.', ',', '0', '1', '2', '3', '4', '5', '6', '8'].into(),
+    background: None,
+    flags: 0,
+};
+let image = image::open("mylove.jpg").unwrap();
+let (w, h) = image.dimensions();
+let mut frame = TerminalFrame {
+    fragments: Vec::with_capacity(w * h),
+    cfg: cfg.clone(),
+};
+aarty::convert_image_to_ascii(&cfg, &image, &mut frame).expect("Write error");
+
+## Dependencies graph
+
+![deps graph](./_deps.png)
+
+> Generated with [cargo-depgraph](https://crates.io/crates/cargo-depgraph)
