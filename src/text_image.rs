@@ -211,6 +211,7 @@ impl TextImage {
         self.len() == 0
     }
 
+    #[cfg(feature = "colors")]
     #[inline(always)]
     fn _background(&self, f: &mut fmt::Formatter<'_>) -> std::result::Result<bool, fmt::Error> {
         if let Some(bc) = &self.config.background {

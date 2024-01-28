@@ -150,7 +150,7 @@ pub use text_image::{Fragment, IndexdFragment, TextImage, ToTextImage};
 
 #[cfg(feature = "colors")]
 use color::{ANSI_BACKGROUND_ESCAPE, ANSI_ESCAPE_CLOSE, ANSI_FOREGROUND_ESCAPE};
-use std::{error::Error, io::Write, mem};
+use std::{error::Error, io::Write};
 
 /// Use colors flag.
 pub const COLORS: u8 = 0b1;
@@ -188,6 +188,7 @@ pub trait FragmentWriter {
 }
 
 impl<W: Write> FragmentWriter for W {
+    #[cfg(feature = "colors")]
     #[inline]
     fn background(&mut self, bc: &ANSIColor) -> Result<bool, Box<dyn Error>> {
         self.write_bytes(bc.to_string().as_bytes())?;
@@ -259,7 +260,10 @@ impl Config {
 
     /// Calculate how much space the raw representation would use (the worst case).
     pub const fn calc_buf_size(&self, w: u32, h: u32) -> usize {
+        #[allow(unused_mut)]
         let mut res = w as usize * h as usize;
+
+        #[cfg(feature = "colors")]
         if self.use_colors() {
             //XXX: cheack from this.
             res = (res
@@ -315,6 +319,7 @@ where
     W: FragmentWriter,
 {
     let (width, height) = image.dimensions();
+    #[cfg(feature = "colors")]
     let ansi_close = if let Some(bc) = &config.background {
         if !config.reversed() {
             out.background(bc)?
@@ -342,7 +347,7 @@ where
                     let mut fg = Some(fi.fg.clone());
                     let mut bc = config.background.clone();
                     if !ansi_close && config.reversed() {
-                        mem::swap(&mut bc, &mut fg);
+                        std::mem::swap(&mut bc, &mut fg);
                     }
                     out.write_colored_fragment(fi, bc.as_ref(), fg.as_ref())?;
                 }
@@ -359,6 +364,7 @@ where
         out.write_bytes("\n".as_bytes())?;
     }
 
+    #[cfg(feature = "colors")]
     if ansi_close {
         out.write_bytes(ANSI_ESCAPE_CLOSE.as_bytes())?;
     }
