@@ -1,4 +1,4 @@
-use crate::{color::ANSIColor, PixelImage, Rgba};
+use crate::{PixelImage, Rgba};
 
 impl<T, P> PixelImage for T
 where
@@ -31,14 +31,17 @@ where
         }
     }
 }
-impl From<image::Rgb<u8>> for ANSIColor {
+
+#[cfg(feature = "colors")]
+impl From<image::Rgb<u8>> for crate::ANSIColor {
     fn from(value: image::Rgb<u8>) -> Self {
-        ANSIColor::new(value[0], value[1], value[2])
+        crate::ANSIColor::new(value[0], value[1], value[2])
     }
 }
 
-impl From<image::Rgba<u8>> for ANSIColor {
+#[cfg(feature = "colors")]
+impl From<image::Rgba<u8>> for crate::ANSIColor {
     fn from(value: image::Rgba<u8>) -> Self {
-        ANSIColor::new(value[0], value[1], value[2])
+        crate::ANSIColor::new(value[0], value[1], value[2])
     }
 }
