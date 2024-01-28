@@ -60,7 +60,7 @@ impl Opts {
                 "c" | "sympols" | "chars" => opts.sym_set = value!(arg)?.chars().collect(),
                 "s" | "scale" => {
                     opts.scale = NonZeroU8::new(value!(parse; "scale", arg)?)
-                        .ok_or_else(|| "The scale should be greaer than 0,".to_string())?
+                        .ok_or_else(|| "The scale shouldn't be less than 1,".to_string())?
                 }
                 "w" | "col" | "columans" | "width" => {
                     opts.width = Some(value!(parse; "width", arg)?)
@@ -77,7 +77,7 @@ impl Opts {
                 "sfl" | "sl" => opts.sf = FilterType::Lanczos3,
                 "sfn" | "sn" => opts.sf = FilterType::Nearest,
                 "v" | "version" => info(format!("aarty v{VERSION}")),
-                unknown => return Err(format!("Unknown opthion {unknown}")),
+                unknown => return Err(format!("Unknown option {unknown}")),
             }
         }
 
