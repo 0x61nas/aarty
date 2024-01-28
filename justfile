@@ -18,6 +18,7 @@ setup:
     cargo install cargo-deny
     cargo install cargo-audit --features=fix
     cargo install typos-cli
+    cargo install cargo-hack
 #   pip install codespell
 
 # Run all the tests
@@ -28,12 +29,13 @@ test:
 # Check the program with all features enabled.
 check:
     cargo check
-    cargo deny check
-    cargo deny check licenses
+    cargo hack check --feature-powerset --rust-version
     committed aurora..HEAD --no-merge-commit
-    cargo audit
     typos
     codespell --skip="target,git,_typos.toml" --ignore-words="{{justfile_directory()}}/.codespellignore"
+    cargo deny check
+    cargo deny check licenses
+    cargo audit
 
 @lint:
     cargo fmt --all -- --check --verbose
