@@ -100,7 +100,7 @@ println!("{image}");
 We offer a simple binary that's implement the most of this crate features. You can build it with the build command or if u use cargo then you can install it via `cargo install aarty`.
 
 > [!Note]
-> for more information about the binary and how to use it, you can run `aarty --help` or see this [document](./docs/bin.md).
+> for more information about the binary and how to use it, you can run `aarty --help` or see this [match](https://github.com/0x61nas/aarty/blob/aurora/src/bin/args.rs#L59).
 
 
 ## Contributing
