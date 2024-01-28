@@ -237,6 +237,7 @@ impl<W: Write> FragmentWriter for W {
 /// the main config structure
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub struct Config {
     /// The sympols (characters) set.
     pub sympols: Sympols,
@@ -248,14 +249,24 @@ pub struct Config {
 }
 
 impl Config {
-    /// return true if the [`REVERSE`] flag is set.
-    pub const fn reversed(&self) -> bool {
-        self.flags & REVERSE == REVERSE
+    /// Construct a new instance.
+    #[inline]
+    #[must_use]
+    pub const fn new(sympols: Sympols) -> Self {
+        Self {
+            sympols,
+            #[cfg(feature = "colors")]
+            background: None,
+            flags: 0,
+        }
     }
 
-    /// return true if the [`COLORS`] flag is set.
-    pub const fn use_colors(&self) -> bool {
-        self.flags & COLORS == COLORS
+    /// Set the config flags.
+    #[inline]
+    #[must_use]
+    pub const fn with_flags(mut self, flags: u8) -> Self {
+        self.flags = flags;
+        self
     }
 
     /// Calculate how much space the raw representation would use (the worst case).
@@ -276,9 +287,43 @@ impl Config {
     }
 }
 
+#[cfg(feature = "colors")]
+impl Config {
+    #[inline]
+    #[must_use]
+    pub fn with_background(mut self, color: impl Into<ANSIColor>) -> Self {
+        self.background = Some(color.into());
+        self
+    }
+
+    /// Construct a new instance with th background color set.
+    #[inline]
+    #[must_use]
+    pub const fn new_with_background(sympols: Sympols, background_color: ANSIColor) -> Self {
+        Self {
+            sympols,
+            background: Some(background_color),
+            flags: 0,
+        }
+    }
+
+    /// return true if the [`REVERSE`] flag is set.
+    #[inline]
+    pub const fn reversed(&self) -> bool {
+        self.flags & REVERSE == REVERSE
+    }
+
+    /// return true if the [`COLORS`] flag is set.
+    #[inline]
+    pub const fn use_colors(&self) -> bool {
+        self.flags & COLORS == COLORS
+    }
+}
+
 /// the fragment (a.k.a. pixel) information.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub struct FragmentInfo {
     /// the character that had chosen from the sympols set to represent this pixel.
     pub sym: char,
@@ -330,7 +375,12 @@ where
         false
     };
 
-    let colored = cfg!(feature = "colors") && config.use_colors();
+    #[cfg(feature = "colors")]
+    let colored = config.use_colors();
+
+    // FIXME: i don't like this way
+    #[cfg(not(feature = "colors"))]
+    let colored = false;
 
     for y in 0..height {
         for x in 0..width {

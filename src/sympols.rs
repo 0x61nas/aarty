@@ -44,7 +44,7 @@ impl Sympols {
         self.set.is_empty()
     }
 
-    /// Calculate the index if the sympol in the set based on th [`RGBA`] value.
+    /// Calculate the index of the sympol in the set based on the [`RGBA`] value.
     #[inline]
     pub(crate) fn sym_index(&self, pixel: &Rgba) -> usize {
         if self.is_empty() {

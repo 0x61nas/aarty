@@ -40,6 +40,7 @@ pub struct TextImage {
 /// it can be useful by reduce the size that required to store a [`crate::Fragment`] by 3 bytes less.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[non_exhaustive]
 pub struct IndexdFragment {
     /// The sympol index in the provided sympols set.
     pub sym_index: u8,
@@ -50,22 +51,31 @@ pub struct IndexdFragment {
 
 impl IndexdFragment {
     /// Construct a new instance.
-    #[inline(always)]
+    #[inline]
+    #[must_use]
     pub const fn new(sym_index: u8) -> Self {
-        #[cfg(not(feature = "colors"))]
-        return Self { sym_index };
-
-        #[cfg(feature = "colors")]
         Self {
             sym_index,
+            #[cfg(feature = "colors")]
             fg: crate::color::TRANSBARENT,
         }
     }
+}
+
+#[cfg(feature = "colors")]
+impl IndexdFragment {
+    /// Set the foreground color.
+    #[inline]
+    #[must_use]
+    pub fn with_foreground(mut self, fg: impl Into<ANSIColor>) -> Self {
+        self.fg = fg.into();
+        self
+    }
 
     /// Construct a new instance with foreground color.
-    #[cfg(feature = "colors")]
-    #[inline(always)]
-    pub const fn new_with_color(sym_index: u8, fg: ANSIColor) -> Self {
+    #[inline]
+    #[must_use]
+    pub const fn new_with_foreground(sym_index: u8, fg: ANSIColor) -> Self {
         Self { sym_index, fg }
     }
 }
@@ -94,21 +104,11 @@ impl Fragment {
     /// Construct a new instance.
     #[inline(always)]
     pub const fn new(ch: char) -> Self {
-        #[cfg(not(feature = "colors"))]
-        return Self { ch };
-
-        #[cfg(feature = "colors")]
         Self {
             ch,
+            #[cfg(feature = "colors")]
             fg: crate::color::TRANSBARENT,
         }
-    }
-
-    /// Construct a new instance with foreground color.
-    #[cfg(feature = "colors")]
-    #[inline(always)]
-    pub const fn new_with_color(ch: char, fg: ANSIColor) -> Self {
-        Self { ch, fg }
     }
 
     /// Get the character.
@@ -116,9 +116,25 @@ impl Fragment {
     pub const fn sym(&self) -> char {
         self.ch
     }
+}
+
+#[cfg(feature = "colors")]
+impl Fragment {
+    /// Set the foreground color.
+    #[inline]
+    #[must_use]
+    pub fn with_foreground(mut self, fg: impl Into<ANSIColor>) -> Self {
+        self.fg = fg.into();
+        self
+    }
+
+    /// Construct a new instance with foreground color.
+    #[inline(always)]
+    pub const fn new_with_foueground(ch: char, fg: ANSIColor) -> Self {
+        Self { ch, fg }
+    }
 
     /// Get the fragment foreground.
-    #[cfg(feature = "colors")]
     #[inline(always)]
     pub const fn foreground(&self) -> &ANSIColor {
         &self.fg
@@ -211,7 +227,23 @@ impl TextImage {
         self.len() == 0
     }
 
-    #[cfg(feature = "colors")]
+    #[inline(always)]
+    fn _fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut i = 0;
+        for frag in &self.fragments {
+            if i == self.row_len {
+                i = 0;
+                writeln!(f)?;
+            }
+            f.write_str(&self.config.sympols.get(frag.sym_index as usize).to_string())?;
+            i += 1;
+        }
+        Ok(())
+    }
+}
+
+#[cfg(feature = "colors")]
+impl TextImage {
     #[inline(always)]
     fn _background(&self, f: &mut fmt::Formatter<'_>) -> std::result::Result<bool, fmt::Error> {
         if let Some(bc) = &self.config.background {
@@ -221,11 +253,9 @@ impl TextImage {
         Ok(false)
     }
 
-    #[cfg(feature = "colors")]
     #[inline]
     fn _color_fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let has_background = {
-            #[cfg(feature = "reverse")]
             if self.config.reversed() {
                 let mut r = false;
                 if let Some(bc) = &self.config.background {
@@ -238,8 +268,6 @@ impl TextImage {
             } else {
                 self._background(f)?
             }
-            #[cfg(not(feature = "reverse"))]
-            self._background(f)?
         };
 
         let mut i = 0;
@@ -250,14 +278,11 @@ impl TextImage {
             }
             i += 1;
 
-            #[cfg(feature = "reverse")]
             if self.config.reversed() {
                 write!(f, "{c:-}", c = frag.fg)
             } else {
                 write!(f, "{c}", c = frag.fg)
             }?;
-            #[cfg(not(feature = "reverse"))]
-            write!(f, "{c}", c = frag.fg)?;
 
             write!(
                 f,
@@ -270,20 +295,6 @@ impl TextImage {
             f.write_str(ANSI_ESCAPE_CLOSE)?;
         }
 
-        Ok(())
-    }
-
-    #[inline(always)]
-    fn _fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut i = 0;
-        for frag in &self.fragments {
-            if i == self.row_len {
-                i = 0;
-                writeln!(f)?;
-            }
-            f.write_str(&self.config.sympols.get(frag.sym_index as usize).to_string())?;
-            i += 1;
-        }
         Ok(())
     }
 }
