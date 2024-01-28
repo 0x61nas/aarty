@@ -1,7 +1,9 @@
-use std::{env, num::NonZeroU8};
+use std::{env, num::NonZeroU8, process};
 
 use aarty::{COLORS, REVERSE};
 use image::imageops::FilterType;
+
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub struct Opts {
     /// The image to convert to ASCII art
@@ -74,6 +76,7 @@ impl Opts {
                 "sfg" | "sg" => opts.sf = FilterType::Gaussian,
                 "sfl" | "sl" => opts.sf = FilterType::Lanczos3,
                 "sfn" | "sn" => opts.sf = FilterType::Nearest,
+                "v" | "version" => info(format!("aarty v{VERSION}")),
                 unknown => return Err(format!("Unknown opthion {unknown}")),
             }
         }
@@ -97,4 +100,10 @@ impl Default for Opts {
             sf: FilterType::Nearest,
         }
     }
+}
+
+#[cold]
+fn info(msg: String) -> ! {
+    println!("{msg}");
+    process::exit(0)
 }
