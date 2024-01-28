@@ -32,7 +32,7 @@ include = [
 [[bin]]
 name = "aarty"
 path = "src/bin/main.rs"
-required-features = ["image"]
+required-features = ["image", "colors"]
 
 [dependencies]
 image = { version = "0.24", optional = true }
