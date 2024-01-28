@@ -295,13 +295,13 @@ pub struct FragmentInfo {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Rgba {
     /// Red.
-    r: u8,
+    pub r: u8,
     /// Green.
-    g: u8,
+    pub g: u8,
     /// Blue.
-    b: u8,
+    pub b: u8,
     /// Alpha.
-    a: u8,
+    pub a: u8,
 }
 
 /// Convert the image into ASCII art based on the [`Config`] and write it to the [`FragmentWriter`].
