@@ -10,11 +10,8 @@
 //! ```no_run
 //! # use aarty::*;
 //! # use std::io::{self, BufWriter};
-//! let cfg = Config {
-//!     sympols: vec![' ', '.', ',', '-', '~', '!', '*', '%', '$', '@', '#'].into(),
-//!     background: None,
-//!     flags: 0,
-//! };
+//! let cfg = Config::new(vec![' ', '.', ',', '-', '~', '!', '*', '%', '$', '@', '#'].into());
+//!
 //! let image = image::open("mylove.jpg").unwrap();
 //! let (w, h) = image.dimensions();
 //!
@@ -25,23 +22,19 @@
 //! Enable the foreground colors
 //! ```no_run
 //! # use aarty::*;
-//! let cfg = Config {
-//!     sympols: vec![' ', '.', ',', '-', '~', '!', '*', '%', '$', '@', '#'].into(),
-//!     background: None,
-//!     flags: COLORS,
-//! };
+//! let cfg = Config::new(vec![' ', '.', ',', '-', '~', '!', '*', '%'].into()).with_flags(COLORS);
+//!
 //! // ...
 //! ```
+//!
 //! Reverse them with the background color
 //! ```no_run
 //! # use aarty::*;
-//! let cfg = Config {
-//!     sympols: Sympols::empty(),
-//!     background: Some((232, 209, 204).into()),
-//!     flags: COLORS | REVERSE,
-//! };
+//! let cfg = Config::new(Sympols::empty()).with_background((232, 209, 204)).with_flags(COLORS | REVERSE);
+//!
 //! // ...
 //! ```
+//!
 //! If you wanna build a rebresentesion in memory so you can modify it or use it multiple times, then you may found that implement [`FragmentWriter`]
 //! for such a structher is useful.
 //! ```no_run
@@ -79,11 +72,8 @@
 //! }
 //!
 //! // So you can use it as a buffer
-//! let cfg = Config {
-//!     sympols: vec!['.', ',', '0', '1', '2', '3', '4', '5', '6', '8'].into(),
-//!     background: None,
-//!     flags: 0,
-//! };
+//! let cfg = Config::new(vec!['I', 'L', 'O', 'V', 'E', 'U'].into()).with_flags(COLORS);
+//!
 //! let image = image::open("mylove.jpg").unwrap();
 //! let (w, h) = image.dimensions();
 //! let mut frame = TerminalFrame {
@@ -93,7 +83,8 @@
 //! aarty::convert_image_to_ascii(&cfg, &image, &mut frame).expect("Write error");
 //! //  Do whatever you want with this object...
 //! ```
-//! But be aware if you take this way, you'll have to implement the rendaring mechanism when its its the time to print the image (a.k.a. rendering it).
+//!
+//! But be aware by doing this, you'll have to implement the rendaring mechanism when its its the time to print the image (a.k.a. rendering it).
 //!
 //! For such this case, we have [`TextImage`], which basically dose the same thing as the code above but in more ergnomic way, And it does implement the rendering mechanism, so you can just print it, and it will render the image properly.
 //! You can enable this type with `text_image` feature, which is enabled by default.
@@ -102,11 +93,8 @@
 //! ```no_run
 //! # use aarty::*;
 //! use aarty::ToTextImage;
-//! let cfg = Config {
-//!     sympols: Sympols::empty(),
-//!     background: Some((232, 209, 204).into()),
-//!     flags: COLORS | REVERSE,
-//! };
+//! let cfg = Config::new_with_background(Sympols::empty(), (232, 209, 204).into()).with_flags(COLORS | REVERSE);
+//!
 //! let image = image::open("mylove.jpg").unwrap().to_text(cfg);
 //! println!("{image}");
 //!```
