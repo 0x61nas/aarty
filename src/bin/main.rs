@@ -68,18 +68,12 @@ fn main() {
         image.resize_exact(w, h, opts.sf)
     };
 
-    let config = Config {
-        sympols: (opts.sym_set).into(),
-        background: {
-            if let Some(_) = &opts.background {
-                // TODO: parse the color like `lanterna`
-                Some((255, 208, 187).into())
-            } else {
-                None
-            }
-        },
-        flags: opts.flags,
-    };
+    let mut config = Config::new(opts.sym_set.into()).with_flags(opts.flags);
+
+    if let Some(_) = &opts.background {
+        // TODO: parse the color like `lanterna`
+        config = config.with_background((255, 208, 187));
+    }
 
     let buf_size = config.calc_buf_size(w, h);
 
