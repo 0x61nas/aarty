@@ -5,7 +5,7 @@ permissions:
   contents: read
 on:
   push:
-    branches: [main]
+    branches: [aurora]
   pull_request:
   schedule:
     - cron:  '7 7 * * *'
