@@ -118,6 +118,7 @@
 //! [mit]: https://github.com/0x61nas/aarty/blob/aurora/LICENSE
 //!
 #![deny(rust_2018_idioms, non_ascii_idents, missing_debug_implementations)]
+#![warn(missing_docs)]
 
 /// ANSI color.
 #[cfg(feature = "colors")]
