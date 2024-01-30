@@ -279,6 +279,7 @@ impl Config {
 
 #[cfg(feature = "colors")]
 impl Config {
+    /// Set the background color.
     #[inline]
     #[must_use]
     pub fn with_background(mut self, color: impl Into<ANSIColor>) -> Self {

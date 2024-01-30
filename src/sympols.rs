@@ -3,6 +3,7 @@ use crate::Rgba;
 /// An empty sympols set.
 pub const EMPTY_SET: Sympols = Sympols::new(vec![]);
 
+/// The default empty character(a.k.a. sympol). Reterund by [`Sympols::get`] when the sympols is [`EMPTY_SET`].
 pub const EMPTY_CHAR: char = ' ';
 
 /// The sympols (characters) that we will use to represent our pixels based on their color.
