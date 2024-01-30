@@ -287,7 +287,7 @@ impl Config {
         self
     }
 
-    /// Construct a new instance with th background color set.
+    /// Construct a new instance with the background color set.
     #[inline]
     #[must_use]
     pub const fn new_with_background(sympols: Sympols, background_color: ANSIColor) -> Self {
