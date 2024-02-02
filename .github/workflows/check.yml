@@ -99,7 +99,7 @@ jobs:
     # https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
     strategy:
       matrix:
-        msrv: ["1.65"] 
+        msrv: ["1.70"] 
     name: ubuntu / ${{ matrix.msrv }}
     steps:
       - uses: actions/checkout@v4

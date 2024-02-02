@@ -1,8 +1,8 @@
 [package]
 name = "aarty"
-version = "0.6.1-alpha.1"
+version = "0.6.1-alpha.2"
 edition = "2021"
-rust-version = "1.65"
+rust-version = "1.70"
 authors = ["Anas Elgarhy <anas.elgarhy.dev@gmail.com>"]
 description = "Mini-framework to display pictures on your terminal"
 repository = "https://github.com/0x61nas/aarty"
@@ -34,6 +34,16 @@ name = "aarty"
 path = "src/bin/main.rs"
 required-features = ["image", "colors"]
 
+[[bench]]
+name = "text_image"
+harness = false
+required-features = ["text_image", "image"]
+
+[[bench]]
+name = "convert_to_ascii"
+harness = false
+required-features = ["image"]
+
 [dependencies]
 image = { version = "0.24", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
@@ -48,3 +58,6 @@ image = ["dep:image", "rayon", "cfg-if"]
 reverse = []
 serde = ["dep:serde"]
 text_image = []
+
+[dev-dependencies]
+criterion = "0.5.1"
