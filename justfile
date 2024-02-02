@@ -57,4 +57,4 @@ coverage-report: coverage
 generate-readme:
     cargo readme --template _readme.tpl > README.md
     sed -i "s/\*\*Note\*\*/\[!Note\]/g" README.md
-    cargo depgraph --all-features --all-deps --depth 70 | dot -Tpng > _deps.png
+    cargo depgraph --all-features --build-deps --target-deps --depth 70 | dot -Tpng > _deps.png
