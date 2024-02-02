@@ -2,7 +2,7 @@
 name = "aarty"
 version = "0.6.1-alpha.1"
 edition = "2021"
-rust-version = "1.65"
+rust-version = "1.70"
 authors = ["Anas Elgarhy <anas.elgarhy.dev@gmail.com>"]
 description = "Mini-framework to display pictures on your terminal"
 repository = "https://github.com/0x61nas/aarty"
