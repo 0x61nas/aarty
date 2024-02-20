@@ -11,11 +11,14 @@ on:
       - aurora
   schedule:
     - cron: "0 0 * * 0"
+permissions:
+  packages: write
+  contents: read
 
 jobs:
   docker:
     name: Docker Build and Push
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
