@@ -14,16 +14,6 @@ RUN cargo build --release --locked \
   && rm -f target/release/deps/aarty*
 
 FROM debian:buster-slim as runner
-RUN sed -i '/path\-exclude\s\/usr\/share\/man\/\*/d' /etc/dpkg/dpkg.cfg.d/docker
-RUN apt-get update && \
-  apt-get install -y --no-install-recommends --allow-unauthenticated \
-  less \
-  man-db \
-  manpages && \
-  apt-get install -y --reinstall coreutils && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
-RUN mandb
 COPY --from=builder /app/target/release/aarty /usr/local/bin
 WORKDIR /app
 ENTRYPOINT ["aarty"]
