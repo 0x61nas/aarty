@@ -22,6 +22,7 @@ categories = [
 ]
 include = [
     "src/**/*",
+    "benches/**/*",
     "Cargo.toml",
     "README.md",
     "LICENSE",
