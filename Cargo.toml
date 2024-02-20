@@ -1,6 +1,6 @@
 [package]
 name = "aarty"
-version = "0.6.1-alpha.2"
+version = "0.7.0-alpha.1"
 edition = "2021"
 rust-version = "1.70"
 authors = ["Anas Elgarhy <anas.elgarhy.dev@gmail.com>"]

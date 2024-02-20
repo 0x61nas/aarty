@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "aarty"
-version = "0.6.1-alpha.2"
+version = "0.7.0-alpha.1"
 dependencies = [
  "cfg-if",
  "criterion",
