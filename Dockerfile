@@ -1,4 +1,4 @@
-FROM lukemathwalker/cargo-chef:0.1.63-rust-1.76-slim-buster AS chef
+FROM lukemathwalker/cargo-chef:0.1.63-rust-1.76-alpine AS chef
 WORKDIR /app
 
 FROM chef AS planner
@@ -13,7 +13,7 @@ COPY . .
 RUN cargo build --release --locked \
   && rm -f target/release/deps/aarty*
 
-FROM debian:buster-slim as runner
+FROM alpine:latest as runner
 COPY --from=builder /app/target/release/aarty /usr/local/bin
 WORKDIR /app
 ENTRYPOINT ["aarty"]
