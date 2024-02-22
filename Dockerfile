@@ -9,7 +9,9 @@ FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 RUN cargo chef cook --release --recipe-path recipe.json
-COPY . .
+COPY Cargo.toml .
+COPY Cargo.lock .
+COPY src/ src/
 RUN cargo build --release --locked \
   && rm -f target/release/deps/aarty*
 
