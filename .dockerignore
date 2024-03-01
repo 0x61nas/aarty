@@ -1,0 +1,24 @@
+# Directories
+/.git/
+/.github/
+/samples/
+/benches/
+
+# Files
+.gitignore
+*.md
+LICENSE-*
+committed.toml
+cliff.toml
+deny.toml
+CNAME
+rustfmt.toml
+_config.yml
+codecov.yml
+.editorconfig
+.codespellignore
+renovate.json
+justfile
+_typos.toml
+_readme.tpl
+*.png
