@@ -3,6 +3,7 @@ WORKDIR /app
 
 FROM chef AS planner
 COPY . .
+RUN sed -i '/^\[\[bench\]\]/,/^$/d' Cargo.toml
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder
@@ -11,6 +12,7 @@ ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY Cargo.toml .
 COPY Cargo.lock .
+RUN sed -i '/^\[\[bench\]\]/,/^$/d' Cargo.toml
 COPY src/ src/
 RUN cargo build --release --locked \
   && rm -f target/release/deps/aarty*
