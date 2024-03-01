@@ -62,3 +62,9 @@ text_image = []
 
 [dev-dependencies]
 criterion = "0.5.1"
+
+[profile.release]
+panic = "abort"
+strip = "symbols"
+lto = true
+codegen-units = 1
