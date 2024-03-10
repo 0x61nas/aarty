@@ -46,7 +46,7 @@ harness = false
 required-features = ["image"]
 
 [dependencies]
-image = { version = "0.24", optional = true }
+image = { version = "0.25", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
 # transitive dependencies
 rayon = { version = ">=1.9.0", optional = true }
