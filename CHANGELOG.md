@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - *(cliff)* Setup git-cliff
 - *(changelog)* Introduce the changelog
 - *(release)* Configure release plz
+- *(changelog)* Re-generate changelog
 
 
 
