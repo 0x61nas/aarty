@@ -7,9 +7,15 @@ All notable changes to this project will be documented in this file.
 > this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [unreleased]
 
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate image to 0.25 ([#62](https://github.com/0x61nas/aarty/issues/62))
+
 ### ⚙️ Miscellaneous Tasks
 
 - *(cliff)* Setup git-cliff
+- *(changelog)* Introduce the changelog
+- *(release)* Configure release plz
 
 
 
