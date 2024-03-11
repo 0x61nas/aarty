@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 
 > [!Note]
 > this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## [unreleased]
+## [0.7.0-alpha.4] - 2024-03-11
 
 ### 🐛 Bug Fixes
 
@@ -17,10 +17,13 @@ All notable changes to this project will be documented in this file.
 - *(changelog)* Introduce the changelog
 - *(release)* Configure release plz
 - *(changelog)* Re-generate changelog
+- *(cargo)* Ver bump
 
 
 
 
+
+> **Full Changelog**: https://github.com/0x61nas/aarty/compare/v0.7.0-alpha.2...v0.7.0-alpha.4
 
 ## [0.7.0-alpha.2] - 2024-03-08
 
