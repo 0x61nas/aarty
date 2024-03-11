@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 > this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [unreleased]
 
+## [0.7.0-alpha.3](https://github.com/0x61nas/aarty/compare/v0.7.0-alpha.2...v0.7.0-alpha.3) - 2024-03-11
+
+### Other
+- Merge branch 'aurora' into chore/git-cliff
+- *(changelog)* introduce the changelog
+
 ### ⚙️ Miscellaneous Tasks
 
 - *(cliff)* Setup git-cliff
