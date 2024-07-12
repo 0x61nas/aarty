@@ -65,6 +65,7 @@ criterion = "0.5.1"
 
 [profile.release]
 panic = "abort"
-strip = "symbols"
-lto = true
+strip = true
+lto = "fat"
 codegen-units = 1
+debug = false
