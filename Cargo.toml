@@ -61,7 +61,7 @@ serde = ["dep:serde"]
 text_image = []
 
 [dev-dependencies]
-criterion = "0.5.1"
+criterion = "0.8.0"
 
 [profile.release]
 panic = "abort"
