@@ -36,7 +36,7 @@ body = """
 {% endif %}
 
 {%- macro remote_url() -%}
-  https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}
+  https://github.com/0x61nas/aarty
 {%- endmacro -%}
 """
 # template for the changelog footer
@@ -54,7 +54,7 @@ postprocessors = [
 # parse the commits based on https://www.conventionalcommits.org
 conventional_commits = true
 # filter out the commits that are not conventional
-filter_unconventional = true
+filter_unconventional = false
 # process each line of a commit as an individual commit
 split_commits = false
 # regex for preprocessing the commit messages
