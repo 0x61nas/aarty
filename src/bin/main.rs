@@ -70,7 +70,7 @@ fn main() {
 
     let mut config = Config::new(opts.sym_set.into()).with_flags(opts.flags);
 
-    if let Some(_) = &opts.background {
+    if opts.background.is_some() {
         // TODO: parse the color like `lanterna`
         config = config.with_background((255, 208, 187));
     }
