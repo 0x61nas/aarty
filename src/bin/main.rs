@@ -8,7 +8,7 @@ use std::{
 };
 
 use aarty::{convert_image_to_ascii, Config};
-use image::{io::Reader, GenericImageView};
+use image::{GenericImageView, ImageReader};
 
 use crate::args::Opts;
 
@@ -29,7 +29,7 @@ fn main() {
     };
 
     let Ok(image) = (if let Some(path) = opts.path.as_ref() {
-        match Reader::open(path) {
+        match ImageReader::open(path) {
             Ok(r) => r,
             Err(e) => {
                 eprintln!("{e}");
@@ -44,7 +44,7 @@ fn main() {
             eprintln!("{e}");
             process::exit(IO_ERR);
         }
-        let Ok(reader) = Reader::new(Cursor::new(buf)).with_guessed_format() else {
+        let Ok(reader) = ImageReader::new(Cursor::new(buf)).with_guessed_format() else {
             eprintln!("Can't read the input");
             process::exit(IO_ERR);
         };
