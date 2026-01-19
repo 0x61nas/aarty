@@ -1,9 +1,6 @@
 # configuration for https://github.com/EmbarkStudios/cargo-deny
 
 [licenses]
-default = "deny"
-unlicensed = "deny"
-copyleft = "deny"
 confidence-threshold = 0.8
 allow = [
     "MIT",
