@@ -86,7 +86,7 @@
 //!
 //! But be aware by doing this, you'll have to implement the rendaring mechanism when its its the time to print the image (a.k.a. rendering it).
 //!
-//! For such this case, we have [`TextImage`], which basically dose the same thing as the code above but in more ergnomic way, And it does implement the rendering mechanism, so you can just print it, and it will render the image properly.
+//! For such this case, we have [`TextImage`], which basically dose the same thing as the code above but in more ergonomic way, And it does implement the rendering mechanism, so you can just print it, and it will render the image properly.
 //! You can enable this type with `text_image` feature, which is enabled by default.
 //!
 //! The `text_image` feature also include the [`ToTextImage`] trait, which provide an ergonomic way to construct an [`TextImage`] object.
