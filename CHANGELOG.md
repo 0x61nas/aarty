@@ -11,6 +11,10 @@ All notable changes to this project will be documented in this file.
 
 - *(args)* Allow custom version overwrite in the build
 
+### 📚 Documentation
+
+- *(readme)* Re-generate
+
 ### ⚙️ Miscellaneous Tasks
 
 - *(changelog)* Update
@@ -18,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - *(cargo)* [**breaking**] Bump msrv to 1.85.1
 - *(license)* Update the copyright year
 - *(docker)* Update base builder image
+- *(cargo.lock)* Update deps
 
 
 
