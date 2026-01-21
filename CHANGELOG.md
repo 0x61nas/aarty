@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 
 > [!Note]
 > this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [unreleased]
+
+### 🚀 Features
+
+- *(args)* Allow custom version overwrite in the build
+
+### ⚙️ Miscellaneous Tasks
+
+- *(changelog)* Update
+- *(cargo)* [**breaking**] Update lock file
+- *(cargo)* [**breaking**] Bump msrv to 1.85.1
+- *(license)* Update the copyright year
+- *(docker)* Update base builder image
+
+
+
+
+
 ## [0.7.1] - 2026-01-19
 
 ### 🚀 Features
