@@ -3,7 +3,11 @@ use std::{env, num::NonZeroU8, process};
 use aarty::{COLORS, REVERSE};
 use image::imageops::FilterType;
 
-const VERSION: &str = env!("CARGO_PKG_VERSION");
+// const VERSION: &str = option_env!("AARTY_BUILD_OVERWRITE_VERSION").unwrap_or(env!("CARGO_PKG_VERSION")); // require unstable for now
+const VERSION: &str = match option_env!("AARTY_BUILD_OVERWRITE_VERSION") {
+    Some(v) => v,
+    None => env!("CARGO_PKG_VERSION"),
+};
 
 pub struct Opts {
     /// The image to convert to ASCII art
