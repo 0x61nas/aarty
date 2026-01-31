@@ -57,7 +57,7 @@ impl IndexdFragment {
         Self {
             sym_index,
             #[cfg(feature = "colors")]
-            fg: crate::color::TRANSBARENT,
+            fg: crate::color::TRANSPARENT,
         }
     }
 }
@@ -107,7 +107,7 @@ impl Fragment {
         Self {
             ch,
             #[cfg(feature = "colors")]
-            fg: crate::color::TRANSBARENT,
+            fg: crate::color::TRANSPARENT,
         }
     }
 

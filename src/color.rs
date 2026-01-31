@@ -6,7 +6,7 @@ pub(crate) const ANSI_ESCAPE_CLOSE: &str = "\u{001b}[0m";
 pub(crate) const ANSI_FOREGROUND_ESCAPE: &str = "\u{001b}[38;2;";
 pub(crate) const ANSI_BACKGROUND_ESCAPE: &str = "\u{001b}[48;2;";
 pub(crate) const ANSI_COLOR_CODE_LEN: usize = 12;
-pub(crate) const TRANSBARENT: ANSIColor = ANSIColor {
+pub(crate) const TRANSPARENT: ANSIColor = ANSIColor {
     inner: String::new(),
 };
 
@@ -78,7 +78,7 @@ impl From<Rgba> for ANSIColor {
     fn from(value: Rgba) -> Self {
         let Rgba { r, g, b, a } = value;
         if a < 120 {
-            return TRANSBARENT;
+            return TRANSPARENT;
         }
         ANSIColor::new(r, g, b)
     }
