@@ -186,12 +186,6 @@ impl<W: Write> FragmentWriter for W {
     }
 
     #[inline]
-    fn write_bytes(&mut self, bytes: &[u8]) -> Result<(), Box<dyn Error>> {
-        self.write_all(bytes)?;
-        Ok(())
-    }
-
-    #[inline]
     fn write_fragment(&mut self, info: FragmentInfo) -> Result<(), Box<dyn Error>> {
         self.write_all(info.sym.to_string().as_bytes())?;
         Ok(())
@@ -220,6 +214,12 @@ impl<W: Write> FragmentWriter for W {
         if fc.is_some() {
             self.write_all(ANSI_ESCAPE_CLOSE.as_bytes())?;
         }
+        Ok(())
+    }
+
+    #[inline]
+    fn write_bytes(&mut self, bytes: &[u8]) -> Result<(), Box<dyn Error>> {
+        self.write_all(bytes)?;
         Ok(())
     }
 }
