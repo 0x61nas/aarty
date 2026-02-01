@@ -81,6 +81,7 @@ impl Opts {
                 "sfl" | "sl" => opts.sf = FilterType::Lanczos3,
                 "sfn" | "sn" => opts.sf = FilterType::Nearest,
                 "v" | "version" => info(format!("aarty v{VERSION}")),
+                "help" => print_help(),
                 unknown => return Err(format!("Unknown option {unknown}")),
             }
         }
@@ -110,4 +111,30 @@ impl Default for Opts {
 fn info(msg: String) -> ! {
     println!("{msg}");
     process::exit(0)
+}
+
+#[cold]
+fn print_help() -> ! {
+    let defaults = Opts::default();
+    info(format!(
+        "Usage: aarty [options] [path]
+
+Options:
+  -c, --symbols, --chars <chars>     Symbols set to use (default: \"{}\")
+  -s, --scale <n>                    Scale factor (>= 1, default: {})
+  -w, --col, --columns, --width <n>  Output width (default: auto)
+  -h, --row, --rows, --height <n>    Output height (default: auto)
+  -b, --back, --background <color>   Background color (default: none)
+  -r, --reverse                      Reverse output
+  -u, --color, --colors              Enable colors
+      --sft, --st                    Triangle filter
+      --sfc, --sc                    Catmull-Rom filter
+      --sfg, --sg                    Gaussian filter
+      --sfl, --sl                    Lanczos3 filter
+      --sfn, --sn                    Nearest filter (default)
+  -v, --version                      Show version
+      --help                         Show this help",
+        defaults.sym_set.iter().collect::<String>(),
+        defaults.scale.get(),
+    ))
 }
