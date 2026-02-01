@@ -1,0 +1,137 @@
+.TH AARTY 1 "February 2026" "aarty 0.8.0" "User Commands"
+.SH NAME
+aarty \- render images as ANSI art in the terminal
+
+.SH SYNOPSIS
+.B aarty
+.RI [ options ] " [path]"
+
+.SH DESCRIPTION
+.B aarty
+converts images into ANSI-colored ASCII/character art suitable for terminal display.
+If no path is provided, input is read from stdin.
+
+.SH OPTIONS
+.TP
+.BR -c ", " --symbols ", " --chars " <chars>"
+Character set used for rendering, ordered from darkest to brightest.
+.br
+Default:
+.B " .,-~!;:=*&%$@#"
+
+.TP
+.BR -s ", " --scale " <n>"
+Scale factor for output.
+Must be greater than or equal to 1.
+.br
+Default: 4
+
+.TP
+.BR -w ", " --col ", " --columns ", " --width " <n>"
+Set output width in columns.
+.br
+Default: auto
+
+.TP
+.BR -h ", " --row ", " --rows ", " --height " <n>"
+Set output height in rows.
+.br
+Default: auto
+
+.TP
+.BR -b ", " --back ", " --background " <color>"
+Set background color (ANSI RGB format).
+
+.TP
+.BR -r ", " --reverse
+Reverse brightness mapping.
+
+.TP
+.BR -u ", " --color ", " --colors
+Enable ANSI colors in output.
+
+.TP
+.BR --sft ", " --st
+Use Triangle scaling filter.
+
+.TP
+.BR --sfc ", " --sc
+Use Catmull-Rom scaling filter.
+
+.TP
+.BR --sfg ", " --sg
+Use Gaussian scaling filter.
+
+.TP
+.BR --sfl ", " --sl
+Use Lanczos3 scaling filter.
+
+.TP
+.BR --sfn ", " --sn
+Use Nearest-neighbor scaling filter.
+.br
+Default filter.
+
+.TP
+.BR -v ", " --version
+Print version information and exit.
+
+.TP
+.BR --help
+Print help and exit.
+
+.SH EXAMPLES
+Render an image with default settings:
+.RS
+.B aarty image.png
+.RE
+
+Use a custom character set:
+.RS
+.B aarty -c "@%#*+=-:. " image.jpg
+.RE
+
+Scale output by 2 and force width:
+.RS
+.B aarty --scale 2 --width 120 image.png
+.RE
+
+Enable colors with a black background:
+.RS
+.B aarty --colors --background 0;0;0 image.png
+.RE
+
+Use Lanczos filter for higher quality:
+.RS
+.B aarty --sl image.png
+.RE
+
+Use reverse colors and an empty character set:
+.RS
+.B aarty image.jpg -h 235 -u -r -c ""
+.RE
+
+Read image from stdin:
+.RS
+.B cat image.png | aarty
+.RE
+
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+Invalid arguments or runtime error.
+.TP
+.B 2
+IO error, can't open needed files or allocate memory.
+.TP
+.B 3
+Operations error.
+
+.SH AUTHOR
+Written by Anas Elgarhy.
+
+.SH LICENSE
+MIT License.
